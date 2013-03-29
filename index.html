@@ -278,8 +278,12 @@ function createFoot(inName) {
 function createShinJet(inName) {
 	var shinjet = new THREE.Object3D();
 
+	var modifier = new THREE.SubdivisionModifier( 1 );
+	var tubeGeometry = new THREE.CylinderGeometry( 15, 15, 60, 30, 10 );
+	modifier.modify( tubeGeometry ); 	
+
 	var tube = THREE.SceneUtils.createMultiMaterialObject( 
-		new THREE.CylinderGeometry( 15, 15, 60, 20, 4 ), 
+		tubeGeometry, 
 		Robot.redFrame );
 	tube.position.set(0, 50, 0);
 	tube.name = 'tube';
@@ -528,13 +532,13 @@ function init()
 	container.appendChild( stats.domElement );
 
 	// LIGHT
-	var light1 = createLight("light1");
-	light1.position.set(200,300, 200);
-	scene.add(light1);
+	// var light1 = createLight("light1");
+	// light1.position.set(200,300, 200);
+	// scene.add(light1);
 
-	var light2 = createLight("light2");
-	light2.position.set(60,300,-100);
-	scene.add(light2);
+	// var light2 = createLight("light2");
+	// light2.position.set(60,300,-100);
+	// scene.add(light2);
 
 	var ambientLight = new THREE.AmbientLight(0x111111);
 	scene.add(ambientLight);	
@@ -561,6 +565,10 @@ function init()
 
 	var bob = createRobot("bob");
 	scene.add(bob);
+
+	var angus = createRobot("angus");
+	angus.position.set(500, 0, 0);
+	scene.add(angus);
 
 	// scene.add(createPartsPile());
 }
