@@ -155,8 +155,12 @@ function createTank(inName) {
 function createEye() {
 	var eye = new THREE.Object3D();
 
+	var modifier = new THREE.SubdivisionModifier( 1 );
+	var socketGeometry = new THREE.CylinderGeometry( 5, 5, 20, 20, 8 );
+	modifier.modify(socketGeometry);
+
 	var socket = THREE.SceneUtils.createMultiMaterialObject( 
-		new THREE.CylinderGeometry( 5, 5, 20, 20, 4 ), 
+		socketGeometry, 
 		Robot.goldFrame );
 	socket.rotation.x = Math.PI / 2;
 
