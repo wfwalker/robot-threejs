@@ -195,6 +195,13 @@ function createHead() {
 function createBody() {
 	var body = new THREE.Object3D();
 
+	var tube = THREE.SceneUtils.createMultiMaterialObject( 
+		new THREE.CylinderGeometry( 3, 3, 100, 20, 4 ), 
+		Robot.steelFrame );
+	tube.rotation.z = Math.PI / 2;
+	tube.position.y = 110;
+	body.add(tube);	
+
 	var lefttank = createTank("lefttank");
 	lefttank.position.set(15, 80, 25);
 	body.add(lefttank);
@@ -439,10 +446,10 @@ function createPlatform(inName) {
 	var platform = new THREE.Object3D();
 
 	var floor = THREE.SceneUtils.createMultiMaterialObject( 
-		new THREE.CubeGeometry( 800, 800, 10, 1, 1, 1 ), 
+		new THREE.CubeGeometry( 800, 800, 100, 1, 1, 1 ), 
 		Robot.floorFrame );
-	floor.name = "heel";
-	floor.position.y = -5;
+	floor.name = "platform";
+	floor.position.y = -50;
 	floor.rotation.x = Math.PI / 2;
 
 	platform.add(floor);
@@ -534,10 +541,10 @@ function init()
 
 	// SKYBOX/FOG
 	var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
-	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x333333, side: THREE.BackSide } );
+	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x555555, side: THREE.BackSide } );
 	var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
 	scene.add(skyBox);
-	scene.fog = new THREE.FogExp2( 0x333333, 0.0005 );
+	scene.fog = new THREE.FogExp2( 0x555555, 0.0005 );
 	
 	////////////
 	// CUSTOM //
@@ -548,7 +555,7 @@ function init()
 
 	for (var index = 0; index < 100; index++) {
 		var randomPlat = createPlatform('platform' + index);
-		randomPlat.position.set(-5000 + Math.random() * 10000, -200 + Math.random() * 100, -5000 + Math.random() * 10000);
+		randomPlat.position.set(-5000 + Math.random() * 10000, -550 + Math.random() * 500, -5000 + Math.random() * 10000);
 		scene.add(randomPlat);
 	}
 
@@ -585,8 +592,6 @@ function pose(inRobot, inAction) {
 	var headAngle = 0;
 
 	if (inAction == Robot.PUSH_FORWARDS) {
-		leftShin.getChildByName('shinJet').getChildByName('flare').color = 0xffffff;
-		leftShin.getChildByName('shinJet').getChildByName('flare').color = 0xffffff;
 		leftAngle = rightAngle = -0.3;
 	} else if (inAction == Robot.PUSH_BACKWARDS) {
 		leftAngle = rightAngle = 0.3;
@@ -595,8 +600,7 @@ function pose(inRobot, inAction) {
 	} else if (inAction == Robot.TURN_COUNTERCLOCKWISE) {
 		leftAngle = -0.3; rightAngle = 0.0; headAngle = -0.6;
 	} else {
-		leftShin.getChildByName('shinJet').getChildByName('flare').color = 0xff0000;
-		leftShin.getChildByName('shinJet').getChildByName('flare').color = 0xff0000;
+
 	}
 
 	leftLeg.rotation.x = leftAngle;
