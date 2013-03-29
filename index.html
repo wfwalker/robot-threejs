@@ -66,16 +66,21 @@ animate();
 function createLimbJoint(inName, diameter, thickness) {
 	var joint = new THREE.Object3D();
 
+	var modifier = new THREE.SubdivisionModifier( 1 );
+	var outerGeometry = new THREE.CylinderGeometry( diameter, diameter, thickness, 30, 4 );
+	modifier.modify(outerGeometry);
 	var outer = THREE.SceneUtils.createMultiMaterialObject( 
-		new THREE.CylinderGeometry( diameter, diameter, thickness, 20, 4 ), 
+		outerGeometry, 
 		Robot.goldFrame );
 	outer.position.set(0, 0, 0);
 	outer.rotation.z = Math.PI / 2;
 
 	joint.add(outer);
 
+	var innerGeometry = new THREE.CylinderGeometry( diameter/2, diameter/2, thickness+.5, 30, 4 );
+	modifier.modify(innerGeometry);
 	var inner = THREE.SceneUtils.createMultiMaterialObject( 
-		new THREE.CylinderGeometry( diameter/2, diameter/2, thickness+.5, 20, 4 ), 
+		innerGeometry, 
 		Robot.redFrame );
 	inner.position.set(0, 0, 0);
 	inner.rotation.z = Math.PI / 2;
@@ -167,8 +172,13 @@ function createEye() {
 function createHead() {
 	var head = new THREE.Object3D();
 
+	var modifier = new THREE.SubdivisionModifier( 1 );
+
+	var skullGeometry = new THREE.CylinderGeometry( 18, 18, 30, 40, 6 );
+	modifier.modify(skullGeometry);
+
 	var skull = THREE.SceneUtils.createMultiMaterialObject( 
-		new THREE.CylinderGeometry( 18, 18, 30, 20, 4 ), 
+		skullGeometry, 
 		Robot.redFrame );
 	skull.position.set(0, 20, 0);
 	head.add(skull);
@@ -220,7 +230,7 @@ function createBody() {
 	bodyBox.position.y = 80;
 	body.add(bodyBox);
 
-	var hipsGeometry = new THREE.CubeGeometry( 50, 35, 20, 4, 4, 4 );
+	var hipsGeometry = new THREE.CubeGeometry( 50, 35, 30, 4, 4, 4 );
 	modifier.modify(hipsGeometry);
 	var hips = THREE.SceneUtils.createMultiMaterialObject( 
 		hipsGeometry, 
@@ -303,7 +313,7 @@ function createShinJet(inName) {
 function createLeg(inName) {
 	var leg = new THREE.Object3D();
 
-	var hip = createLimbJoint("hip", 13, 20);
+	var hip = createLimbJoint("hip", 16, 19);
 	leg.add(hip);
 
 	var thigh = createLimbSegment("thigh", 70, 5);
@@ -643,16 +653,13 @@ function update()
 		pose(bob, Robot.PUSH_BACKWARDS);
 		bob.translateZ(  moveDistance );
 	}
-	if ( keyboard.pressed("W") || keyboard.pressed("S") ||  
-	     keyboard.pressed("A") || keyboard.pressed("D") || 
-	     keyboard.pressed("Z") || keyboard.pressed("C") ) {
+	if ( keyboard.pressed("W") || keyboard.pressed("S") ) {
 	} else {
 		pose(bob, 0);
 	}
 
 	// rotate left/right/up/down
 	var rotation_matrix = new THREE.Matrix4().identity();
-	var camera_rotation_matrix = new THREE.Matrix4().identity();
 	if ( keyboard.pressed("A") ) {
 		pose(bob, Robot.TURN_CLOCKWISE);
 		rotation_matrix = new THREE.Matrix4().makeRotationY(rotateAngle);
@@ -661,14 +668,7 @@ function update()
 		pose(bob, Robot.TURN_COUNTERCLOCKWISE);
 		rotation_matrix = new THREE.Matrix4().makeRotationY(-rotateAngle);
 	}
-	if ( keyboard.pressed("R") ) {
-		camera_rotation_matrix = new THREE.Matrix4().makeRotationY(rotateAngle);
-	}
-	if ( keyboard.pressed("F") ) {
-		camera_rotation_matrix = new THREE.Matrix4().makeRotationY(-rotateAngle);
-	}
-	if ( keyboard.pressed("A") || keyboard.pressed("D") || 
-	     keyboard.pressed("R") || keyboard.pressed("F") )
+	if ( keyboard.pressed("A") || keyboard.pressed("D") )
 	{
 		bob.matrix.multiply(rotation_matrix);
 		bob.rotation.setEulerFromRotationMatrix(bob.matrix);
@@ -704,6 +704,13 @@ function render()
 
 <div><canvas style="width: 1132px; height: 865px;" height="865" width="1132"></canvas></div>
 
-<div style='position:absolute; top: 0px; left: 0px; z-index: 1000; background-color: white; font-size: 2em'>robot-threejs</div>
+<div style='position:absolute; top: 0px; left: 0px; z-index: 1000; background-color: white; font-size: 2em'>
+<a href="https://github.com/wfwalker/robot-threejs"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_green_007200.png" alt="Fork me on GitHub"></a>
+</div>
+
+<div style='position:absolute; top: 0px; right: -0px; z-index: 1000; background-color: white; font-size: 2em'>
+robot-threejs
+</div>
+
 
 </body></html>
