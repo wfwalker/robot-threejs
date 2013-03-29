@@ -26,6 +26,7 @@
 <script src="js/THREEx_003.js"></script>
 <script src="js/THREEx.js"></script>
 <script src="js/THREEx_002.js"></script>
+<script src="js/SubdivisionModifier.js"></script>
 
 <!-- load fonts -->
 <script src="js/gentilis_bold.js"></script>
@@ -38,8 +39,6 @@
 <script src="js/droid_sans_bold.js"></script>
 <script src="js/droid_serif_regular.js"></script>
 <script src="js/droid_serif_bold.js"></script>
-
-
 
 <script>
 /*
@@ -204,14 +203,20 @@ function createBody() {
 	righttank.position.set(-15, 80, 25);
 	body.add(righttank);
 
+	var bodyGeometry = new THREE.CubeGeometry( 70, 80, 30, 4, 4, 4 );
+	var modifier = new THREE.SubdivisionModifier( 1 );
+	modifier.modify( bodyGeometry ); 
+
 	var bodyBox = THREE.SceneUtils.createMultiMaterialObject( 
-		new THREE.CubeGeometry( 70, 80, 30, 1, 1, 1 ), 
+		bodyGeometry, 
 		Robot.steelFrame );
 	bodyBox.position.y = 80;
 	body.add(bodyBox);
 
+	var hipsGeometry = new THREE.CubeGeometry( 50, 35, 20, 4, 4, 4 );
+	modifier.modify(hipsGeometry);
 	var hips = THREE.SceneUtils.createMultiMaterialObject( 
-		new THREE.CubeGeometry( 50, 35, 20, 1, 1, 1 ), 
+		hipsGeometry, 
 		Robot.steelFrame );
 	hips.position.y = 20;
 	body.add(hips);
@@ -686,5 +691,7 @@ function render()
 </script>
 
 <div><canvas style="width: 1132px; height: 865px;" height="865" width="1132"></canvas></div>
+
+<div style='position:absolute; top: 0px; left: 0px; z-index: 1000; background-color: white; font-size: 2em'>robot-threejs</div>
 
 </body></html>
