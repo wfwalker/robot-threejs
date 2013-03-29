@@ -242,8 +242,11 @@ function createBody() {
 	hips.position.y = 20;
 	body.add(hips);
 
+	var beltGeometry = new THREE.CubeGeometry( 43, 30, 23, 4, 4, 4 );
+	modifier.modify(beltGeometry);
+
 	var belt = THREE.SceneUtils.createMultiMaterialObject( 
-		new THREE.CubeGeometry( 45, 15, 15, 1, 1, 1 ), 
+		beltGeometry, 
 		Robot.goldFrame );
 	belt.position.y = 40;
 	body.add(belt);
@@ -581,7 +584,7 @@ function init()
 	scene.add(bob);
 
 	var angus = createRobot("angus");
-	angus.position.set(500, 0, 0);
+	angus.position.set(300, 0, 0);
 	scene.add(angus);
 
 	// scene.add(createPartsPile());
@@ -713,7 +716,8 @@ function render()
 </div>
 
 <div style='position:absolute; top: 0px; right: -0px; z-index: 1000; background-color: white; font-size: 2em'>
-robot-threejs
+robot-threejs<br />
+bill walker
 </div>
 
 
