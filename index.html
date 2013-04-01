@@ -484,6 +484,7 @@ function createPlatform(inName) {
 function init() 
 {
 	// States
+	Robot.FLOAT = 0;
 	Robot.PUSH_BACKWARDS = 1;
 	Robot.PUSH_FORWARDS = 2;
 	Robot.TURN_CLOCKWISE = 4;
@@ -585,11 +586,16 @@ function animate()
 {
     requestAnimationFrame( animate );
 
-    var bob = scene.getChildByName("bob");
-    bob.position.y = 6*Math.sin(Date.now()/700)+3;
+	var bob = scene.getChildByName("bob");
+
+    if (bob.pose == Robot.FLOAT) {
+	    var bob = scene.getChildByName("bob");
+	    bob.position.y = 6*Math.sin(Date.now()/700)+3;    	
+    }
 
 	render();		
-	update();
+	update(bob);
+	cameraChases(bob);
 }
 
 function hide(inRobot, inPath) {
@@ -615,7 +621,7 @@ function show(inRobot, inPath) {
 }
 
 
-function pose(inRobot, inAction) {
+function pose(inRobot) {
 	var head = inRobot.getChildByName('head');
 	var leftLeg = inRobot.getChildByName('leftleg');
 	var rightLeg = inRobot.getChildByName('rightleg');
@@ -630,20 +636,25 @@ function pose(inRobot, inAction) {
 	var rightAngle = 0;
 	var headAngle = 0;
 
-	if (inAction == Robot.PUSH_FORWARDS) {
-		hide(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
-		hide(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
-
-		leftAngle = rightAngle = -0.3;
-	} else if (inAction == Robot.PUSH_BACKWARDS) {
-		leftAngle = rightAngle = 0.3;
-	} else if (inAction == Robot.TURN_CLOCKWISE) {
-		leftAngle = 0.0; rightAngle = -0.3; headAngle = 0.6;
-	} else if (inAction == Robot.TURN_COUNTERCLOCKWISE) {
-		leftAngle = -0.3; rightAngle = 0.0; headAngle = -0.6;
-	} else {
+	if (inRobot.pose == Robot.PUSH_FORWARDS) {
 		show(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
 		show(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
+		leftAngle = rightAngle = -0.3;
+	} else if (inRobot.pose == Robot.PUSH_BACKWARDS) {
+		show(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
+		show(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
+		leftAngle = rightAngle = 0.3;
+	} else if (inRobot.pose == Robot.TURN_CLOCKWISE) {
+		hide(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
+		show(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
+		leftAngle = 0.0; rightAngle = -0.3; headAngle = 0.6;
+	} else if (inRobot.pose == Robot.TURN_COUNTERCLOCKWISE) {
+		show(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
+		hide(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
+		leftAngle = -0.3; rightAngle = 0.0; headAngle = -0.6;
+	} else if (inRobot.pose == Robot.FLOAT) {
+		hide(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
+		hide(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
 	}
 
 	leftLeg.rotation.x = leftAngle;
@@ -659,64 +670,69 @@ function pose(inRobot, inAction) {
 	rightforearm.rotation.x = Math.abs(rightAngle);
 }
 
-function update()
+function parseKeyboardCommands(inRobot) {
+	// move forwards/backwards/left/right
+	if ( keyboard.pressed("W") ) {
+		inRobot.pose = Robot.PUSH_FORWARDS;
+	} else if ( keyboard.pressed("S") ) {
+		inRobot.pose = Robot.PUSH_BACKWARDS;
+	} else if ( keyboard.pressed("A") ) {
+		inRobot.pose = Robot.TURN_CLOCKWISE;
+	} else if ( keyboard.pressed("D") ) {
+		inRobot.pose = Robot.TURN_COUNTERCLOCKWISE;
+	} else {
+		inRobot.pose = Robot.FLOAT;
+	}
+}
+
+function update(inRobot)
 {
-    var bob = scene.getChildByName("bob");
+	parseKeyboardCommands(inRobot);
 
 	var delta = clock.getDelta(); // seconds.
 	var moveDistance = 200 * delta; // 200 pixels per second
 	var rotateAngle = Math.PI / 2 * delta;   // pi/2 radians (90 degrees) per second
-	
-	// local transformations
+	var rotation_matrix = new THREE.Matrix4().identity();
+
+	pose(inRobot);	
 
 	// move forwards/backwards/left/right
-	if ( keyboard.pressed("W") ) {
-		pose(bob, Robot.PUSH_FORWARDS);
-		bob.translateZ( -moveDistance );
-	}
-	if ( keyboard.pressed("S") ) {
-		pose(bob, Robot.PUSH_BACKWARDS);
-		bob.translateZ(  moveDistance );
-	}
-	if ( keyboard.pressed("W") || keyboard.pressed("S") || keyboard.pressed("A") || keyboard.pressed("D") ) {
-	} else {
-		pose(bob, 0);
-	}
-
-	// rotate left/right/up/down
-	var rotation_matrix = new THREE.Matrix4().identity();
-	if ( keyboard.pressed("A") ) {
-		pose(bob, Robot.TURN_CLOCKWISE);
+	if (inRobot.pose == Robot.PUSH_FORWARDS) {
+		inRobot.translateZ( -moveDistance );
+	} else if (inRobot.pose == Robot.PUSH_BACKWARDS) {
+		inRobot.translateZ(  moveDistance );
+	} else if (inRobot.pose == Robot.TURN_CLOCKWISE) {
 		rotation_matrix = new THREE.Matrix4().makeRotationY(rotateAngle);
-	}
-	if ( keyboard.pressed("D") ) {
-		pose(bob, Robot.TURN_COUNTERCLOCKWISE);
+		inRobot.matrix.multiply(rotation_matrix);
+		inRobot.rotation.setEulerFromRotationMatrix(inRobot.matrix);
+	} else if (inRobot.pose == Robot.TURN_COUNTERCLOCKWISE) {
 		rotation_matrix = new THREE.Matrix4().makeRotationY(-rotateAngle);
+		inRobot.matrix.multiply(rotation_matrix);
+		inRobot.rotation.setEulerFromRotationMatrix(inRobot.matrix);
+	} else if (inRobot.pose == Robot.FLOAT) {
+		// do nothing, handled in animate() for now.
 	}
-	if ( keyboard.pressed("A") || keyboard.pressed("D") )
-	{
-		bob.matrix.multiply(rotation_matrix);
-		bob.rotation.setEulerFromRotationMatrix(bob.matrix);
-	}
-	
+}
+
+function cameraChases(inRobot) {
+
 	var relativeCameraOffset = new THREE.Vector3(10,300,300);
 
-	var cameraOffset = relativeCameraOffset.applyMatrix4( bob.matrixWorld );
+	var cameraOffset = relativeCameraOffset.applyMatrix4( inRobot.matrixWorld );
 
 	camera.position.x = cameraOffset.x;
 	camera.position.y = cameraOffset.y;
 	camera.position.z = cameraOffset.z;	
 
 	targetPosition = new THREE.Vector3();
-	targetPosition.x = bob.position.x;
-	targetPosition.y = bob.position.y + 170;
-	targetPosition.z = bob.position.z;
+	targetPosition.x = inRobot.position.x;
+	targetPosition.y = inRobot.position.y + 170;
+	targetPosition.z = inRobot.position.z;
 	camera.lookAt( targetPosition );
 	
 	camera.updateMatrix();
 	camera.updateProjectionMatrix();
 			
-	// controls.update();
 	stats.update();
 }
 
