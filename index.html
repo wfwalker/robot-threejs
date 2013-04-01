@@ -548,15 +548,6 @@ function init()
 	stats.domElement.style.zIndex = 100;
 	container.appendChild( stats.domElement );
 
-	// LIGHT
-	// var light1 = createLight("light1");
-	// light1.position.set(200,300, 200);
-	// scene.add(light1);
-
-	// var light2 = createLight("light2");
-	// light2.position.set(60,300,-100);
-	// scene.add(light2);
-
 	var ambientLight = new THREE.AmbientLight(0x111111);
 	scene.add(ambientLight);	
 
@@ -574,7 +565,7 @@ function init()
 	var start = createPlatform('start');
 	scene.add(start);
 
-	for (var index = 0; index < 100; index++) {
+	for (var index = 0; index < 50; index++) {
 		var randomPlat = createPlatform('platform' + index);
 		randomPlat.position.set(-5000 + Math.random() * 10000, -550 + Math.random() * 500, -5000 + Math.random() * 10000);
 		scene.add(randomPlat);
@@ -601,6 +592,29 @@ function animate()
 	update();
 }
 
+function hide(inRobot, inPath) {
+	var toBeHidden = inRobot;
+	for (var index = 0; index < inPath.length; index++) {
+		toBeHidden = toBeHidden.getChildByName(inPath[index]);
+	}
+
+	toBeHidden.traverse(function (obj) {
+		obj.visible = false;
+	})
+}
+
+function show(inRobot, inPath) {
+	var toBeHidden = inRobot;
+	for (var index = 0; index < inPath.length; index++) {
+		toBeHidden = toBeHidden.getChildByName(inPath[index]);
+	}
+
+	toBeHidden.traverse(function (obj) {
+		obj.visible = true;
+	})
+}
+
+
 function pose(inRobot, inAction) {
 	var head = inRobot.getChildByName('head');
 	var leftLeg = inRobot.getChildByName('leftleg');
@@ -617,6 +631,9 @@ function pose(inRobot, inAction) {
 	var headAngle = 0;
 
 	if (inAction == Robot.PUSH_FORWARDS) {
+		hide(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
+		hide(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
+
 		leftAngle = rightAngle = -0.3;
 	} else if (inAction == Robot.PUSH_BACKWARDS) {
 		leftAngle = rightAngle = 0.3;
@@ -625,7 +642,8 @@ function pose(inRobot, inAction) {
 	} else if (inAction == Robot.TURN_COUNTERCLOCKWISE) {
 		leftAngle = -0.3; rightAngle = 0.0; headAngle = -0.6;
 	} else {
-
+		show(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
+		show(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
 	}
 
 	leftLeg.rotation.x = leftAngle;
@@ -660,7 +678,7 @@ function update()
 		pose(bob, Robot.PUSH_BACKWARDS);
 		bob.translateZ(  moveDistance );
 	}
-	if ( keyboard.pressed("W") || keyboard.pressed("S") ) {
+	if ( keyboard.pressed("W") || keyboard.pressed("S") || keyboard.pressed("A") || keyboard.pressed("D") ) {
 	} else {
 		pose(bob, 0);
 	}
