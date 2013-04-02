@@ -413,6 +413,8 @@ function createRobot(inName) {
 
 	robot.pose = Robot.FLOAT;
 
+	Robot.robots.push(robot);
+
 	return robot;
 }
 
@@ -491,6 +493,8 @@ function init()
 	Robot.PUSH_FORWARDS = 2;
 	Robot.TURN_CLOCKWISE = 4;
 	Robot.TURN_COUNTERCLOCKWISE = 8;
+
+	Robot.robots = [];
 
 	// Materials and Textures
 	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/metal1.jpg' );
@@ -592,16 +596,17 @@ function animate()
 {
     requestAnimationFrame( animate );
 
-	var bob = scene.getChildByName("bob");
+    for (var index = 0; index < Robot.robots.length; index++) {
+		var aRobot = Robot.robots[index];
 
-    if (bob.pose == Robot.FLOAT) {
-	    var bob = scene.getChildByName("bob");
-	    bob.position.y = 6*Math.sin(Date.now()/700)+3;    	
+	    if (aRobot.pose == Robot.FLOAT) {
+		    aRobot.position.y = 6*Math.sin(index * 1000 + Date.now()/700)+3;    	
+	    }
     }
 
 	render();		
-	update(bob);
-	cameraChases(bob);
+	update(Robot.robots[0]);
+	cameraChases(Robot.robots[0]);
 }
 
 function hide(inRobot, inPath) {
