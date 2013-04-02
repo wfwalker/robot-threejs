@@ -306,7 +306,7 @@ function createShinJet(inName) {
 	tube.name = 'tube';
 	shinjet.add(tube);
 
-	var light = createLight();
+	var light = createFlare();
 	light.position.y = 10;
 	light.name = 'flare';
 
@@ -467,6 +467,25 @@ function createLight(inName) {
 	return light;
 }
 
+function createFlare(inName) {
+	var light = new THREE.Object3D();
+
+	var lightCylinder = THREE.SceneUtils.createMultiMaterialObject( 
+	new THREE.CylinderGeometry( 10, 10, 3, 30, 4 ), Robot.lightFrame );
+	lightCylinder.position.set(0, 6, 0);
+	light.add(lightCylinder);
+
+	var lightSource = new THREE.PointLight(0xff0000);
+	lightSource.position.set(0, 0, 0);
+	lightSource.name = 'source';
+	light.add(lightSource);
+
+	light.name = inName;
+
+	return light;
+}
+
+
 function createPlatform(inName) {
 	var platform = new THREE.Object3D();
 
@@ -580,6 +599,7 @@ function init()
 
 	var angus = createRobot("angus");
 	angus.position.set(300, 0, 0);
+	pose(angus);
 	scene.add(angus);
 
 	// scene.add(createPartsPile());
@@ -600,7 +620,7 @@ function animate()
 		var aRobot = Robot.robots[index];
 
 	    if (aRobot.pose == Robot.FLOAT) {
-		    aRobot.position.y = 6*Math.sin(index * 1000 + Date.now()/700)+3;    	
+		    aRobot.position.y = 4*Math.sin(index * 1000 + Date.now()/700)+2;    	
 	    }
     }
 
@@ -725,7 +745,6 @@ function update(inRobot)
 }
 
 function cameraChases(inRobot) {
-
 	var relativeCameraOffset = new THREE.Vector3(10,300,300);
 
 	var cameraOffset = relativeCameraOffset.applyMatrix4( inRobot.matrixWorld );
