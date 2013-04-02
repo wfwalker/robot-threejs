@@ -17,6 +17,7 @@
 </head>
 <body>
 
+<audio id="jet" src="images/jet.wav"/>
 <div id="message"></div>
 
 <script src="js/Three.js"></script>
@@ -692,21 +693,26 @@ function pose(inRobot) {
 		show(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
 		show(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
 		leftAngle = rightAngle = -0.3;
+		document.getElementById('jet').play();
 	} else if (inRobot.pose == Robot.PUSH_BACKWARDS) {
 		show(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
 		show(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
 		leftAngle = rightAngle = 0.3;
+		document.getElementById('jet').play();
 	} else if (inRobot.pose == Robot.TURN_CLOCKWISE) {
 		hide(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
 		show(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
 		leftAngle = 0.0; rightAngle = -0.3; headAngle = 0.6;
+		document.getElementById('jet').play();
 	} else if (inRobot.pose == Robot.TURN_COUNTERCLOCKWISE) {
 		show(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
 		hide(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
 		leftAngle = -0.3; rightAngle = 0.0; headAngle = -0.6;
+		document.getElementById('jet').play();
 	} else if (inRobot.pose == Robot.FLOAT) {
 		hide(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
 		hide(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
+		document.getElementById('jet').pause();
 	}
 
 	leftLeg.rotation.x = leftAngle;
