@@ -17,7 +17,9 @@
 </head>
 <body>
 
-<audio id="jet" src="images/jet.wav"/>
+<audio id="jet" src="images/jet.wav">
+</audio>
+
 <div id="message"></div>
 
 <script src="js/Three.js"></script>
@@ -413,6 +415,9 @@ function createRobot(inName) {
 	robot.name = inName;
 
 	robot.pose = Robot.FLOAT;
+	robot.velocity = 0;
+	robot.maxVelocity = 600;
+	robot.acceleration = 10;
 
 	Robot.robots.push(robot);
 
@@ -747,17 +752,20 @@ function parseKeyboardCommands(inRobot, inEvent) {
 function update(inRobot)
 {
 	var delta = clock.getDelta(); // seconds.
-	var moveDistance = 200 * delta; // 200 pixels per second
+	var moveDistance = delta * inRobot.velocity; // 200 pixels per second
 	var rotateAngle = Math.PI / 2 * delta;   // pi/2 radians (90 degrees) per second
 	var rotation_matrix = new THREE.Matrix4().identity();
+
+	// always moving
+	inRobot.translateZ( moveDistance );
 
 	pose(inRobot);	
 
 	// move forwards/backwards/left/right
 	if (inRobot.pose == Robot.PUSH_FORWARDS) {
-		inRobot.translateZ( -moveDistance );
+		inRobot.velocity = Math.max(-inRobot.maxVelocity, inRobot.velocity - inRobot.acceleration);
 	} else if (inRobot.pose == Robot.PUSH_BACKWARDS) {
-		inRobot.translateZ(  moveDistance );
+		inRobot.velocity = Math.min(inRobot.maxVelocity, inRobot.velocity + inRobot.acceleration);
 	} else if (inRobot.pose == Robot.TURN_CLOCKWISE) {
 		rotation_matrix = new THREE.Matrix4().makeRotationY(rotateAngle);
 		inRobot.matrix.multiply(rotation_matrix);
@@ -767,7 +775,8 @@ function update(inRobot)
 		inRobot.matrix.multiply(rotation_matrix);
 		inRobot.rotation.setEulerFromRotationMatrix(inRobot.matrix);
 	} else if (inRobot.pose == Robot.FLOAT) {
-		// do nothing, handled in animate() for now.
+		// Slow Down! vertical wandering in animate().
+		inRobot.velocity = 0.99 * inRobot.velocity;
 	}
 }
 
