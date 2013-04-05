@@ -463,11 +463,6 @@ function createLight(inName) {
 	lightSphere.position.set(0, 0, 0);
 	light.add(lightSphere);
 
-	// var lightSource = new THREE.PointLight(0x555555);
-	// lightSource.position.set(0, 0, 0);
-	// lightSource.name = 'source';
-	// light.add(lightSource);
-
 	var lightTarget = new THREE.Object3D();
 	lightTarget.position.set(0, 0, -100);
 
@@ -548,6 +543,40 @@ function createGloomyWorld(inScene) {
 	}	
 }
 
+function createSunlitWorld(inScene) {
+	var ambientLight = new THREE.AmbientLight(0x111111);
+	inScene.add(ambientLight);	
+
+	var materialArray = [];
+	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/dawnmountain-xpos.png' ) }));
+	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/dawnmountain-xneg.png' ) }));
+	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/dawnmountain-ypos.png' ) }));
+	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/dawnmountain-yneg.png' ) }));
+	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/dawnmountain-zpos.png' ) }));
+	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/dawnmountain-zneg.png' ) }));
+	for (var i = 0; i < 6; i++)
+	   materialArray[i].side = THREE.BackSide;
+	var skyboxMaterial = new THREE.MeshFaceMaterial( materialArray );
+	
+	var skyboxGeom = new THREE.CubeGeometry( 10000, 10000, 10000, 1, 1, 1 );
+	
+	var skybox = new THREE.Mesh( skyboxGeom, skyboxMaterial );
+
+	inScene.add( skybox );	
+	inScene.fog = new THREE.FogExp2( 0x999999, 0.0002 );
+
+	// floating platforms	
+	var start = createPlatform('start');
+	inScene.add(start);
+
+	for (var index = 0; index < 50; index++) {
+		var randomPlat = createPlatform('platform' + index);
+		randomPlat.position.set(-5000 + Math.random() * 10000, -550 + Math.random() * 500, -5000 + Math.random() * 10000);
+		inScene.add(randomPlat);
+	}	
+}
+
+
 // FUNCTIONS 		
 function init() 
 {
@@ -557,6 +586,7 @@ function init()
 	Robot.PUSH_FORWARDS = 2;
 	Robot.TURN_CLOCKWISE = 4;
 	Robot.TURN_COUNTERCLOCKWISE = 8;
+	Robot.PUNCH = 16;
 
 	Robot.robots = [];
 
@@ -588,7 +618,7 @@ function init()
 	Robot.lightFrame = [ lightMaterial, lightMaterial ]; 
 
 	var flareMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, specular: 0xffffff, ambient: 0xffffff } );
-	var wireframeMaterial2 = new THREE.MeshBasicMaterial( { color: 0x880000, wireframe: true, transparent: true } ); 
+	var wireframeMaterial2 = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true, transparent: true } ); 
 	Robot.flareFrame = [ flareMaterial, flareMaterial ]; 
 
 	// SCENE
@@ -621,6 +651,7 @@ function init()
 	container.appendChild( stats.domElement );
 
 	createGloomyWorld(scene);
+	// createSunlitWorld(scene);
 
 	var bob = createRobot("bob");
 	scene.add(bob);
@@ -679,6 +710,24 @@ function show(inRobot, inPath) {
 	})
 }
 
+function setRotationX(inRobot, inPath, inAngle) {
+	var toRotate = inRobot;
+	for (var index = 0; index < inPath.length; index++) {
+		toRotate = toRotate.getChildByName(inPath[index]);
+	}
+
+	toRotate.rotation.x = inAngle;
+}
+
+function setRotationY(inRobot, inPath, inAngle) {
+	var toRotate = inRobot;
+	for (var index = 0; index < inPath.length; index++) {
+		toRotate = toRotate.getChildByName(inPath[index]);
+	}
+
+	toRotate.rotation.y = inAngle;
+}
+
 function setLightIntensity(inRobot, inPath, inIntensity) {
 	var toBeHidden = inRobot;
 	for (var index = 0; index < inPath.length; index++) {
@@ -691,26 +740,34 @@ function setLightIntensity(inRobot, inPath, inIntensity) {
 }
 
 function pose(inRobot) {
-	var head = inRobot.getChildByName('head');
-	var leftLeg = inRobot.getChildByName('leftleg');
-	var rightLeg = inRobot.getChildByName('rightleg');
-	var leftShin = leftLeg.getChildByName('shin');
-	var rightShin = rightLeg.getChildByName('shin');
-    var leftarm = inRobot.getChildByName("leftarm");
-    var rightarm = inRobot.getChildByName("rightarm");
-    var rightforearm = rightarm.getChildByName("forearm");
-    var leftforearm = leftarm.getChildByName("forearm");
-
-	var leftAngle = 0;
-	var rightAngle = 0;
-	var headAngle = 0;
-
 	if (inRobot.pose == Robot.PUSH_FORWARDS) {
+		setRotationX(inRobot, ['leftleg'], -0.3);
+		setRotationX(inRobot, ['rightleg'], -0.3);
+		setRotationX(inRobot, ['leftleg', 'shin'], -0.5);
+		setRotationX(inRobot, ['rightleg', 'shin'], -0.5);
+		setRotationY(inRobot, ['head'], 0);
+
+		setRotationX(inRobot, ['rightarm'], -0.4);
+		setRotationX(inRobot, ['rightarm', 'forearm'], 0.4);
+		setRotationX(inRobot, ['leftarm'], -0.4);
+		setRotationX(inRobot, ['leftarm', 'forearm'], 0.4);
+
 		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
 		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
 		leftAngle = rightAngle = -0.3;
 		document.getElementById('jet').play();
 	} else if (inRobot.pose == Robot.PUSH_BACKWARDS) {
+		setRotationX(inRobot, ['leftleg'], 0.7);
+		setRotationX(inRobot, ['rightleg'], 0.7);
+		setRotationX(inRobot, ['leftleg', 'shin'], -0.5);
+		setRotationX(inRobot, ['rightleg', 'shin'], -0.5);
+		setRotationY(inRobot, ['head'], 0);
+
+		setRotationX(inRobot, ['rightarm'], -0.3);
+		setRotationX(inRobot, ['rightarm', 'forearm'], 1.1);
+		setRotationX(inRobot, ['leftarm'], -0.3);
+		setRotationX(inRobot, ['leftarm', 'forearm'], 1.1);
+
 		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
 		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
 		leftAngle = rightAngle = 0.3;
@@ -718,30 +775,59 @@ function pose(inRobot) {
 	} else if (inRobot.pose == Robot.TURN_CLOCKWISE) {
 		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
 		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
-		leftAngle = 0.0; rightAngle = -0.3; headAngle = 0.6;
+
+		setRotationX(inRobot, ['leftleg'], 0);
+		setRotationX(inRobot, ['rightleg'], -0.3);
+		setRotationX(inRobot, ['leftleg', 'shin'], 0);
+		setRotationX(inRobot, ['rightleg', 'shin'], -0.5);
+		setRotationY(inRobot, ['head'], 0.5);
+
+		setRotationX(inRobot, ['rightarm'], 0.3);
+		setRotationX(inRobot, ['rightarm', 'forearm'], 0.6);
+		setRotationX(inRobot, ['leftarm'], -0.4);
+		setRotationX(inRobot, ['leftarm', 'forearm'], 0.4);
+
 		document.getElementById('jet').play();
 	} else if (inRobot.pose == Robot.TURN_COUNTERCLOCKWISE) {
 		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
 		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
-		leftAngle = -0.3; rightAngle = 0.0; headAngle = -0.6;
+
+		setRotationX(inRobot, ['leftleg'], -0.3);
+		setRotationX(inRobot, ['rightleg'], 0);
+		setRotationX(inRobot, ['leftleg', 'shin'], -0.5);
+		setRotationX(inRobot, ['rightleg', 'shin'], 0);
+		setRotationY(inRobot, ['head'], -0.5);
+
+		setRotationX(inRobot, ['leftarm'], 0.3);
+		setRotationX(inRobot, ['leftarm', 'forearm'], 0.6);
+		setRotationX(inRobot, ['rightarm'], -0.4);
+		setRotationX(inRobot, ['rightarm', 'forearm'], 0.4);
+
 		document.getElementById('jet').play();
 	} else if (inRobot.pose == Robot.FLOAT) {
+		setRotationX(inRobot, ['leftleg'], 0);
+		setRotationX(inRobot, ['rightleg'], 0);
+		setRotationX(inRobot, ['leftleg', 'shin'], 0);
+		setRotationX(inRobot, ['rightleg', 'shin'], 0);
+		setRotationY(inRobot, ['head'], 0);
+
+		setRotationX(inRobot, ['rightarm'], 0);
+		setRotationX(inRobot, ['rightarm', 'forearm'], 0);
+		setRotationX(inRobot, ['leftarm'], 0);
+		setRotationX(inRobot, ['leftarm', 'forearm'], 0);
+
 		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
 		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
 		document.getElementById('jet').pause();
+	} else if (inRobot.pose == Robot.PUNCH) {
+		setRotationX(inRobot, ['rightarm'], 1.3);
+		setRotationX(inRobot, ['rightarm', 'forearm'], 0.5);
+
+		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
+		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
+		setRotationY(inRobot, ['head'], 0);
+		document.getElementById('jet').pause();
 	}
-
-	leftLeg.rotation.x = leftAngle;
-	rightLeg.rotation.x = rightAngle;
-	leftarm.rotation.x = leftAngle;
-	rightarm.rotation.x = rightAngle;
-	head.rotation.y = headAngle;
-
-	// shins bend backward but never forward
-	leftShin.rotation.x = Math.min(leftAngle, 0);
-	rightShin.rotation.x = Math.min(rightAngle, 0);
-	leftforearm.rotation.x = Math.abs(leftAngle);
-	rightforearm.rotation.x = Math.abs(rightAngle);
 }
 
 function parseKeyboardCommands(inRobot, inEvent) {
@@ -755,6 +841,8 @@ function parseKeyboardCommands(inRobot, inEvent) {
 		inRobot.pose = Robot.TURN_CLOCKWISE;
 	} else if ( keyboard.pressed("D") ) {
 		inRobot.pose = Robot.TURN_COUNTERCLOCKWISE;
+	} else if ( keyboard.pressed("2") ) {
+		inRobot.pose = Robot.PUNCH;
 	} else {
 		inRobot.pose = Robot.FLOAT;
 	}
@@ -780,15 +868,21 @@ function update(inRobot)
 	} else if (inRobot.pose == Robot.TURN_CLOCKWISE) {
 		rotation_matrix = new THREE.Matrix4().makeRotationY(rotateAngle);
 		inRobot.matrix.multiply(rotation_matrix);
+		// Slow Down! unless pushing
+		inRobot.velocity = 0.99 * inRobot.velocity;
 		inRobot.rotation.setEulerFromRotationMatrix(inRobot.matrix);
 	} else if (inRobot.pose == Robot.TURN_COUNTERCLOCKWISE) {
 		rotation_matrix = new THREE.Matrix4().makeRotationY(-rotateAngle);
 		inRobot.matrix.multiply(rotation_matrix);
 		inRobot.rotation.setEulerFromRotationMatrix(inRobot.matrix);
+		// Slow Down! unless pushing
+		inRobot.velocity = 0.99 * inRobot.velocity;
 	} else if (inRobot.pose == Robot.FLOAT) {
 		// Slow Down! vertical wandering in animate().
 		inRobot.velocity = 0.99 * inRobot.velocity;
 	}
+
+	document.getElementById('speedometer').innerHTML = Math.round(inRobot.velocity);
 }
 
 function cameraChases(inRobot) {
@@ -829,6 +923,10 @@ function render()
 robot-threejs<br />
 bill walker<br />
 keys: w, a, s, d<br />
+</div>
+
+<div style='position: absolute; bottom: -0px; right: -0px; z-index: 1000; color: white; font-size: 1.5em'>
+	<span id="speedometer">0</span>
 </div>
 
 
