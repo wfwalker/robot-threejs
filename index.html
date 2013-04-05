@@ -678,6 +678,16 @@ function show(inRobot, inPath) {
 	})
 }
 
+function setLightIntensity(inRobot, inPath, inIntensity) {
+	var toBeHidden = inRobot;
+	for (var index = 0; index < inPath.length; index++) {
+		toBeHidden = toBeHidden.getChildByName(inPath[index]);
+	}
+
+	toBeHidden.traverse(function (obj) {
+		obj.intensity = inIntensity;
+	})
+}
 
 function pose(inRobot) {
 	var head = inRobot.getChildByName('head');
@@ -695,28 +705,28 @@ function pose(inRobot) {
 	var headAngle = 0;
 
 	if (inRobot.pose == Robot.PUSH_FORWARDS) {
-		show(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
-		show(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
+		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
+		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
 		leftAngle = rightAngle = -0.3;
 		document.getElementById('jet').play();
 	} else if (inRobot.pose == Robot.PUSH_BACKWARDS) {
-		show(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
-		show(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
+		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
+		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
 		leftAngle = rightAngle = 0.3;
 		document.getElementById('jet').play();
 	} else if (inRobot.pose == Robot.TURN_CLOCKWISE) {
-		hide(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
-		show(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
+		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
+		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
 		leftAngle = 0.0; rightAngle = -0.3; headAngle = 0.6;
 		document.getElementById('jet').play();
 	} else if (inRobot.pose == Robot.TURN_COUNTERCLOCKWISE) {
-		show(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
-		hide(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
+		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
+		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
 		leftAngle = -0.3; rightAngle = 0.0; headAngle = -0.6;
 		document.getElementById('jet').play();
 	} else if (inRobot.pose == Robot.FLOAT) {
-		hide(inRobot, ['leftleg', 'shin', 'shinJet', 'flare']);
-		hide(inRobot, ['rightleg', 'shin', 'shinJet', 'flare']);
+		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
+		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
 		document.getElementById('jet').pause();
 	}
 
