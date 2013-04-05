@@ -526,6 +526,28 @@ function createPlatform(inName) {
 	return platform;
 }
 
+function createGloomyWorld(inScene) {
+	var ambientLight = new THREE.AmbientLight(0x111111);
+	inScene.add(ambientLight);	
+
+	// SKYBOX/FOG
+	var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
+	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x555555, side: THREE.BackSide } );
+	var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
+	inScene.add(skyBox);
+	inScene.fog = new THREE.FogExp2( 0x555555, 0.0005 );
+
+	// floating platforms	
+	var start = createPlatform('start');
+	inScene.add(start);
+
+	for (var index = 0; index < 50; index++) {
+		var randomPlat = createPlatform('platform' + index);
+		randomPlat.position.set(-5000 + Math.random() * 10000, -550 + Math.random() * 500, -5000 + Math.random() * 10000);
+		inScene.add(randomPlat);
+	}	
+}
+
 // FUNCTIONS 		
 function init() 
 {
@@ -598,28 +620,7 @@ function init()
 	stats.domElement.style.zIndex = 100;
 	container.appendChild( stats.domElement );
 
-	var ambientLight = new THREE.AmbientLight(0x111111);
-	scene.add(ambientLight);	
-
-	// SKYBOX/FOG
-	var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
-	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x555555, side: THREE.BackSide } );
-	var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
-	scene.add(skyBox);
-	scene.fog = new THREE.FogExp2( 0x555555, 0.0005 );
-	
-	////////////
-	// CUSTOM //
-	////////////
-
-	var start = createPlatform('start');
-	scene.add(start);
-
-	for (var index = 0; index < 50; index++) {
-		var randomPlat = createPlatform('platform' + index);
-		randomPlat.position.set(-5000 + Math.random() * 10000, -550 + Math.random() * 500, -5000 + Math.random() * 10000);
-		scene.add(randomPlat);
-	}
+	createGloomyWorld(scene);
 
 	var bob = createRobot("bob");
 	scene.add(bob);
