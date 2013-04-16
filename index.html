@@ -416,8 +416,11 @@ function createRobot(inName) {
 
 	robot.pose = Robot.FLOAT;
 	robot.velocity = 0;
+	robot.radialVelocity = 0;
 	robot.maxVelocity = 600;
 	robot.acceleration = 10;
+	robot.maxRadialVelocity = 0.025;
+	robot.radialAcceleration = 0.0015;
 
 	Robot.robots.push(robot);
 
@@ -834,17 +837,23 @@ function parseKeyboardCommands(inRobot, inEvent) {
 	console.log("PARSE");
 	// move forwards/backwards/left/right
 	if ( keyboard.pressed("W") ) {
-		inRobot.pose = Robot.PUSH_FORWARDS;
+		newPose = Robot.PUSH_FORWARDS;
 	} else if ( keyboard.pressed("S") ) {
-		inRobot.pose = Robot.PUSH_BACKWARDS;
+		newPose = Robot.PUSH_BACKWARDS;
 	} else if ( keyboard.pressed("A") ) {
-		inRobot.pose = Robot.TURN_CLOCKWISE;
+		newPose = Robot.TURN_CLOCKWISE;
 	} else if ( keyboard.pressed("D") ) {
-		inRobot.pose = Robot.TURN_COUNTERCLOCKWISE;
+		newPose = Robot.TURN_COUNTERCLOCKWISE;
 	} else if ( keyboard.pressed("2") ) {
-		inRobot.pose = Robot.PUNCH;
+		newPose = Robot.PUNCH;
 	} else {
-		inRobot.pose = Robot.FLOAT;
+		newPose = Robot.FLOAT;
+	}
+
+	if (inRobot.pose != newPose) {
+		console.log("CHANGE POSE TO " + newPose);
+		inRobot.pose = newPose;
+		pose(inRobot);	
 	}
 }
 
@@ -852,34 +861,36 @@ function update(inRobot)
 {
 	var delta = clock.getDelta(); // seconds.
 	var moveDistance = delta * inRobot.velocity; // 200 pixels per second
-	var rotateAngle = Math.PI / 2 * delta;   // pi/2 radians (90 degrees) per second
+	var rotateAngle = Math.PI / 2 * inRobot.radialVelocity;   // pi/2 radians (90 degrees) per second
 	var rotation_matrix = new THREE.Matrix4().identity();
 
 	// always moving
 	inRobot.translateZ( moveDistance );
 
-	pose(inRobot);	
+	// always rotating
+	rotation_matrix = new THREE.Matrix4().makeRotationY(rotateAngle);
+	inRobot.matrix.multiply(rotation_matrix);
+	inRobot.rotation.setEulerFromRotationMatrix(inRobot.matrix);
 
 	// move forwards/backwards/left/right
 	if (inRobot.pose == Robot.PUSH_FORWARDS) {
 		inRobot.velocity = Math.max(-inRobot.maxVelocity, inRobot.velocity - inRobot.acceleration);
+		inRobot.radialVelocity = 0.9 * inRobot.radialVelocity;
 	} else if (inRobot.pose == Robot.PUSH_BACKWARDS) {
+		inRobot.radialVelocity = 0.9 * inRobot.radialVelocity;
 		inRobot.velocity = Math.min(inRobot.maxVelocity, inRobot.velocity + inRobot.acceleration);
 	} else if (inRobot.pose == Robot.TURN_CLOCKWISE) {
-		rotation_matrix = new THREE.Matrix4().makeRotationY(rotateAngle);
-		inRobot.matrix.multiply(rotation_matrix);
+		inRobot.radialVelocity = Math.min(inRobot.maxRadialVelocity, inRobot.radialVelocity + inRobot.radialAcceleration);
 		// Slow Down! unless pushing
 		inRobot.velocity = 0.99 * inRobot.velocity;
-		inRobot.rotation.setEulerFromRotationMatrix(inRobot.matrix);
 	} else if (inRobot.pose == Robot.TURN_COUNTERCLOCKWISE) {
-		rotation_matrix = new THREE.Matrix4().makeRotationY(-rotateAngle);
-		inRobot.matrix.multiply(rotation_matrix);
-		inRobot.rotation.setEulerFromRotationMatrix(inRobot.matrix);
+		inRobot.radialVelocity = Math.max(-inRobot.maxRadialVelocity, inRobot.radialVelocity - inRobot.radialAcceleration);
 		// Slow Down! unless pushing
 		inRobot.velocity = 0.99 * inRobot.velocity;
 	} else if (inRobot.pose == Robot.FLOAT) {
 		// Slow Down! vertical wandering in animate().
 		inRobot.velocity = 0.99 * inRobot.velocity;
+		inRobot.radialVelocity = 0.9 * inRobot.radialVelocity;
 	}
 
 	document.getElementById('speedometer').innerHTML = Math.round(inRobot.velocity);
