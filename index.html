@@ -887,6 +887,10 @@ function update(inRobot)
 		inRobot.radialVelocity = Math.max(-inRobot.maxRadialVelocity, inRobot.radialVelocity - inRobot.radialAcceleration);
 		// Slow Down! unless pushing
 		inRobot.velocity = 0.99 * inRobot.velocity;
+	} else if (inRobot.pose == Robot.PUNCH) {
+		// Slow Down! vertical wandering in animate().
+		inRobot.velocity = 0.99 * inRobot.velocity;
+		inRobot.radialVelocity = 0.9 * inRobot.radialVelocity;
 	} else if (inRobot.pose == Robot.FLOAT) {
 		// Slow Down! vertical wandering in animate().
 		inRobot.velocity = 0.99 * inRobot.velocity;
