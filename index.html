@@ -584,12 +584,12 @@ function createSunlitWorld(inScene) {
 function init() 
 {
 	// States
-	Robot.FLOAT = 0;
-	Robot.PUSH_BACKWARDS = 1;
-	Robot.PUSH_FORWARDS = 2;
-	Robot.TURN_CLOCKWISE = 4;
-	Robot.TURN_COUNTERCLOCKWISE = 8;
-	Robot.PUNCH = 16;
+	Robot.FLOAT = 1;
+	Robot.PUSH_BACKWARDS = 2;
+	Robot.PUSH_FORWARDS = 4;
+	Robot.TURN_CLOCKWISE = 8;
+	Robot.TURN_COUNTERCLOCKWISE = 16;
+	Robot.PUNCH = 32;
 
 	Robot.robots = [];
 
@@ -743,7 +743,7 @@ function setLightIntensity(inRobot, inPath, inIntensity) {
 }
 
 function pose(inRobot) {
-	if (inRobot.pose == Robot.PUSH_FORWARDS) {
+	if (inRobot.pose & Robot.PUSH_FORWARDS) {
 		setRotationX(inRobot, ['leftleg'], -0.3);
 		setRotationX(inRobot, ['rightleg'], -0.3);
 		setRotationX(inRobot, ['leftleg', 'shin'], -0.5);
@@ -759,7 +759,7 @@ function pose(inRobot) {
 		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
 		leftAngle = rightAngle = -0.3;
 		document.getElementById('jet').play();
-	} else if (inRobot.pose == Robot.PUSH_BACKWARDS) {
+	} else if (inRobot.pose & Robot.PUSH_BACKWARDS) {
 		setRotationX(inRobot, ['leftleg'], 0.7);
 		setRotationX(inRobot, ['rightleg'], 0.7);
 		setRotationX(inRobot, ['leftleg', 'shin'], -0.5);
@@ -775,7 +775,7 @@ function pose(inRobot) {
 		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
 		leftAngle = rightAngle = 0.3;
 		document.getElementById('jet').play();
-	} else if (inRobot.pose == Robot.TURN_CLOCKWISE) {
+	} else if (inRobot.pose & Robot.TURN_CLOCKWISE) {
 		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
 		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
 
@@ -791,7 +791,7 @@ function pose(inRobot) {
 		setRotationX(inRobot, ['leftarm', 'forearm'], 0.4);
 
 		document.getElementById('jet').play();
-	} else if (inRobot.pose == Robot.TURN_COUNTERCLOCKWISE) {
+	} else if (inRobot.pose & Robot.TURN_COUNTERCLOCKWISE) {
 		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
 		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
 
@@ -807,7 +807,7 @@ function pose(inRobot) {
 		setRotationX(inRobot, ['rightarm', 'forearm'], 0.4);
 
 		document.getElementById('jet').play();
-	} else if (inRobot.pose == Robot.FLOAT) {
+	} else if (inRobot.pose & Robot.FLOAT) {
 		setRotationX(inRobot, ['leftleg'], 0);
 		setRotationX(inRobot, ['rightleg'], 0);
 		setRotationX(inRobot, ['leftleg', 'shin'], 0);
@@ -822,7 +822,7 @@ function pose(inRobot) {
 		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
 		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
 		document.getElementById('jet').pause();
-	} else if (inRobot.pose == Robot.PUNCH) {
+	} else if (inRobot.pose & Robot.PUNCH) {
 		setRotationX(inRobot, ['rightarm'], 1.3);
 		setRotationX(inRobot, ['rightarm', 'forearm'], 0.5);
 
@@ -835,18 +835,26 @@ function pose(inRobot) {
 
 function parseKeyboardCommands(inRobot, inEvent) {
 	console.log("PARSE");
+
+	newPose = 0;
+
 	// move forwards/backwards/left/right
 	if ( keyboard.pressed("W") ) {
-		newPose = Robot.PUSH_FORWARDS;
-	} else if ( keyboard.pressed("S") ) {
-		newPose = Robot.PUSH_BACKWARDS;
-	} else if ( keyboard.pressed("A") ) {
-		newPose = Robot.TURN_CLOCKWISE;
-	} else if ( keyboard.pressed("D") ) {
-		newPose = Robot.TURN_COUNTERCLOCKWISE;
-	} else if ( keyboard.pressed("2") ) {
-		newPose = Robot.PUNCH;
-	} else {
+		newPose = newPose | Robot.PUSH_FORWARDS;
+	} 
+	if ( keyboard.pressed("S") ) {
+		newPose = newPose | Robot.PUSH_BACKWARDS;
+	} 
+	if ( keyboard.pressed("A") ) {
+		newPose = newPose | Robot.TURN_CLOCKWISE;
+	} 
+	if ( keyboard.pressed("D") ) {
+		newPose = newPose | Robot.TURN_COUNTERCLOCKWISE;
+	} 
+	if ( keyboard.pressed("2") ) {
+		newPose = newPose | Robot.PUNCH;
+	}  
+	if (newPose == 0) {
 		newPose = Robot.FLOAT;
 	}
 
@@ -873,28 +881,30 @@ function update(inRobot)
 	inRobot.rotation.setEulerFromRotationMatrix(inRobot.matrix);
 
 	// move forwards/backwards/left/right
-	if (inRobot.pose == Robot.PUSH_FORWARDS) {
+	if (inRobot.pose & Robot.PUSH_FORWARDS) {
 		inRobot.velocity = Math.max(-inRobot.maxVelocity, inRobot.velocity - inRobot.acceleration);
 		inRobot.radialVelocity = 0.9 * inRobot.radialVelocity;
-	} else if (inRobot.pose == Robot.PUSH_BACKWARDS) {
+	} 
+	if (inRobot.pose & Robot.PUSH_BACKWARDS) {
 		inRobot.radialVelocity = 0.9 * inRobot.radialVelocity;
 		inRobot.velocity = Math.min(inRobot.maxVelocity, inRobot.velocity + inRobot.acceleration);
-	} else if (inRobot.pose == Robot.TURN_CLOCKWISE) {
+	} 
+	
+	if (inRobot.pose & Robot.TURN_CLOCKWISE) {
 		inRobot.radialVelocity = Math.min(inRobot.maxRadialVelocity, inRobot.radialVelocity + inRobot.radialAcceleration);
-		// Slow Down! unless pushing
-		inRobot.velocity = 0.99 * inRobot.velocity;
-	} else if (inRobot.pose == Robot.TURN_COUNTERCLOCKWISE) {
+	} 
+	if (inRobot.pose & Robot.TURN_COUNTERCLOCKWISE) {
 		inRobot.radialVelocity = Math.max(-inRobot.maxRadialVelocity, inRobot.radialVelocity - inRobot.radialAcceleration);
+	} 
+
+	if (!(inRobot.pose & Robot.TURN_CLOCKWISE || inRobot.pose & Robot.TURN_COUNTERCLOCKWISE)) {
 		// Slow Down! unless pushing
-		inRobot.velocity = 0.99 * inRobot.velocity;
-	} else if (inRobot.pose == Robot.PUNCH) {
-		// Slow Down! vertical wandering in animate().
-		inRobot.velocity = 0.99 * inRobot.velocity;
 		inRobot.radialVelocity = 0.9 * inRobot.radialVelocity;
-	} else if (inRobot.pose == Robot.FLOAT) {
-		// Slow Down! vertical wandering in animate().
-		inRobot.velocity = 0.99 * inRobot.velocity;
-		inRobot.radialVelocity = 0.9 * inRobot.radialVelocity;
+	}
+
+	if (!(inRobot.pose & Robot.PUSH_BACKWARDS || inRobot.pose & Robot.PUSH_FORWARDS)) {
+		// Slow Down! unless pushing
+		inRobot.velocity = 0.95 * inRobot.velocity;
 	}
 
 	document.getElementById('speedometer').innerHTML = Math.round(inRobot.velocity);
