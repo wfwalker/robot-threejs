@@ -376,6 +376,11 @@ function createRobot(inName) {
 	robot.maxRadialVelocity = 0.025;
 	robot.radialAcceleration = 0.0015;
 
+	robot.poseTargets = {};
+	robot.poseTargets.xrotation = {};
+	robot.poseTargets.yrotation = {};
+	robot.poseTargets.lightintensity = {};
+
 	Robot.robots.push(robot);
 
 	return robot;
@@ -641,7 +646,10 @@ function animate()
     }
 
 	render();		
-	update(Robot.robots[0]);
+
+	updateVelocity(Robot.robots[0]);
+	updatePose(Robot.robots[0]);
+
 	cameraChases(Robot.robots[0]);
 }
 
@@ -667,6 +675,30 @@ function show(inRobot, inPath) {
 	})
 }
 
+// set the target x rotation of the object at the specified object path to the given angle
+function setRotationXTarget(inRobot, inObjectPath, inAngle) {
+	inRobot.poseTargets.xrotation[inObjectPath] = inAngle;
+}
+
+// set the target x rotation of the object at the specified object path to the given angle
+function setRotationYTarget(inRobot, inObjectPath, inAngle) {
+	inRobot.poseTargets.yrotation[inObjectPath] = inAngle;
+}
+
+// set the target light intensity of the object at the specified object path to the given angle
+function setLightIntensityTarget(inRobot, inObjectPath, inAngle) {
+	inRobot.poseTargets.lightintensity[inObjectPath] = inAngle;
+}
+
+function getRotationX(inRobot, inPath) {
+	var toRotate = inRobot;
+	for (var index = 0; index < inPath.length; index++) {
+		toRotate = toRotate.getChildByName(inPath[index]);
+	}
+
+	return toRotate.rotation.x;
+}
+
 function setRotationX(inRobot, inPath, inAngle) {
 	var toRotate = inRobot;
 	for (var index = 0; index < inPath.length; index++) {
@@ -676,6 +708,15 @@ function setRotationX(inRobot, inPath, inAngle) {
 	toRotate.rotation.x = inAngle;
 }
 
+function getRotationY(inRobot, inPath) {
+	var toRotate = inRobot;
+	for (var index = 0; index < inPath.length; index++) {
+		toRotate = toRotate.getChildByName(inPath[index]);
+	}
+
+	return toRotate.rotation.y;
+}
+
 function setRotationY(inRobot, inPath, inAngle) {
 	var toRotate = inRobot;
 	for (var index = 0; index < inPath.length; index++) {
@@ -683,6 +724,15 @@ function setRotationY(inRobot, inPath, inAngle) {
 	}
 
 	toRotate.rotation.y = inAngle;
+}
+
+function getLightIntensity(inRobot, inPath) {
+	var toRotate = inRobot;
+	for (var index = 0; index < inPath.length; index++) {
+		toRotate = toRotate.getChildByName(inPath[index]);
+	}
+
+	return toRotate.intensity;
 }
 
 function setLightIntensity(inRobot, inPath, inIntensity) {
@@ -696,93 +746,115 @@ function setLightIntensity(inRobot, inPath, inIntensity) {
 	})
 }
 
+function setPushForwardsPoseTargets(inRobot) {
+	setRotationXTarget(inRobot, ['leftleg'], -0.3);
+	setRotationXTarget(inRobot, ['rightleg'], -0.3);
+	setRotationXTarget(inRobot, ['leftleg', 'shin'], -0.5);
+	setRotationXTarget(inRobot, ['rightleg', 'shin'], -0.5);
+	setRotationYTarget(inRobot, ['head'], 0);
+
+	setRotationXTarget(inRobot, ['rightarm'], -0.4);
+	setRotationXTarget(inRobot, ['rightarm', 'forearm'], 0.4);
+	setRotationXTarget(inRobot, ['leftarm'], -0.4);
+	setRotationXTarget(inRobot, ['leftarm', 'forearm'], 0.4);
+
+	setLightIntensityTarget(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
+	setLightIntensityTarget(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
+}
+
+function setPushBckwardsPoseTargets(inRobot) {
+	setRotationXTarget(inRobot, ['leftleg'], 0.7);
+	setRotationXTarget(inRobot, ['rightleg'], 0.7);
+	setRotationXTarget(inRobot, ['leftleg', 'shin'], -0.5);
+	setRotationXTarget(inRobot, ['rightleg', 'shin'], -0.5);
+	setRotationYTarget(inRobot, ['head'], 0);
+
+	setRotationXTarget(inRobot, ['rightarm'], -0.3);
+	setRotationXTarget(inRobot, ['rightarm', 'forearm'], 1.1);
+	setRotationXTarget(inRobot, ['leftarm'], -0.3);
+	setRotationXTarget(inRobot, ['leftarm', 'forearm'], 1.1);
+
+	setLightIntensityTarget(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
+	setLightIntensityTarget(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
+}
+
+function setTurnClockwisePoseTargets(inRobot) {
+	setRotationXTarget(inRobot, ['leftleg'], 0);
+	setRotationXTarget(inRobot, ['rightleg'], -0.3);
+	setRotationXTarget(inRobot, ['leftleg', 'shin'], 0);
+	setRotationXTarget(inRobot, ['rightleg', 'shin'], -0.5);
+	setRotationYTarget(inRobot, ['head'], 0.5);
+
+	setRotationXTarget(inRobot, ['rightarm'], 0.3);
+	setRotationXTarget(inRobot, ['rightarm', 'forearm'], 0.6);
+	setRotationXTarget(inRobot, ['leftarm'], -0.4);
+	setRotationXTarget(inRobot, ['leftarm', 'forearm'], 0.4);
+
+	setLightIntensityTarget(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
+	setLightIntensityTarget(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
+}
+
+function setTurnCounterclockwisePoseTargets(inRobot) {
+	setRotationXTarget(inRobot, ['leftleg'], -0.3);
+	setRotationXTarget(inRobot, ['rightleg'], 0);
+	setRotationXTarget(inRobot, ['leftleg', 'shin'], -0.5);
+	setRotationXTarget(inRobot, ['rightleg', 'shin'], 0);
+	setRotationYTarget(inRobot, ['head'], -0.5);
+
+	setRotationXTarget(inRobot, ['rightarm'], -0.4);
+	setRotationXTarget(inRobot, ['rightarm', 'forearm'], 0.4);
+	setRotationXTarget(inRobot, ['leftarm'], -0.3);
+	setRotationXTarget(inRobot, ['leftarm', 'forearm'], 0.6);
+
+	setLightIntensityTarget(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
+	setLightIntensityTarget(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
+}
+
+function setFloatPoseTargets(inRobot) {
+	setRotationXTarget(inRobot, ['leftleg'], 0);
+	setRotationXTarget(inRobot, ['rightleg'], 0);
+	setRotationXTarget(inRobot, ['leftleg', 'shin'], 0);
+	setRotationXTarget(inRobot, ['rightleg', 'shin'], 0);
+
+	setRotationYTarget(inRobot, ['head'], 0);
+
+	setRotationXTarget(inRobot, ['rightarm'], 0);
+	setRotationXTarget(inRobot, ['rightarm', 'forearm'], 0);
+	setRotationXTarget(inRobot, ['leftarm'], 0);
+	setRotationXTarget(inRobot, ['leftarm', 'forearm'], 0);
+
+	setLightIntensityTarget(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
+	setLightIntensityTarget(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
+}
+
+function setPunchPoseTargets(inRobot) {
+	setRotationXTarget(inRobot, ['rightarm'], 1.3);
+	setRotationXTarget(inRobot, ['rightarm', 'forearm'], 0.5);
+
+	setRotationYTarget(inRobot, ['head'], 0);
+
+	setLightIntensityTarget(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
+	setLightIntensityTarget(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
+}
+
 function pose(inRobot) {
 	if (inRobot.pose & Robot.PUSH_FORWARDS) {
-		setRotationX(inRobot, ['leftleg'], -0.3);
-		setRotationX(inRobot, ['rightleg'], -0.3);
-		setRotationX(inRobot, ['leftleg', 'shin'], -0.5);
-		setRotationX(inRobot, ['rightleg', 'shin'], -0.5);
-		setRotationY(inRobot, ['head'], 0);
-
-		setRotationX(inRobot, ['rightarm'], -0.4);
-		setRotationX(inRobot, ['rightarm', 'forearm'], 0.4);
-		setRotationX(inRobot, ['leftarm'], -0.4);
-		setRotationX(inRobot, ['leftarm', 'forearm'], 0.4);
-
-		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
-		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
-		leftAngle = rightAngle = -0.3;
+		setPushForwardsPoseTargets(inRobot);
 		document.getElementById('jet').play();
 	} else if (inRobot.pose & Robot.PUSH_BACKWARDS) {
-		setRotationX(inRobot, ['leftleg'], 0.7);
-		setRotationX(inRobot, ['rightleg'], 0.7);
-		setRotationX(inRobot, ['leftleg', 'shin'], -0.5);
-		setRotationX(inRobot, ['rightleg', 'shin'], -0.5);
-		setRotationY(inRobot, ['head'], 0);
-
-		setRotationX(inRobot, ['rightarm'], -0.3);
-		setRotationX(inRobot, ['rightarm', 'forearm'], 1.1);
-		setRotationX(inRobot, ['leftarm'], -0.3);
-		setRotationX(inRobot, ['leftarm', 'forearm'], 1.1);
-
-		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
-		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
-		leftAngle = rightAngle = 0.3;
+		setPushBckwardsPoseTargets(inRobot);
 		document.getElementById('jet').play();
 	} else if (inRobot.pose & Robot.TURN_CLOCKWISE) {
-		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
-		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
-
-		setRotationX(inRobot, ['leftleg'], 0);
-		setRotationX(inRobot, ['rightleg'], -0.3);
-		setRotationX(inRobot, ['leftleg', 'shin'], 0);
-		setRotationX(inRobot, ['rightleg', 'shin'], -0.5);
-		setRotationY(inRobot, ['head'], 0.5);
-
-		setRotationX(inRobot, ['rightarm'], 0.3);
-		setRotationX(inRobot, ['rightarm', 'forearm'], 0.6);
-		setRotationX(inRobot, ['leftarm'], -0.4);
-		setRotationX(inRobot, ['leftarm', 'forearm'], 0.4);
-
+		setTurnClockwisePoseTargets(inRobot);
 		document.getElementById('jet').play();
 	} else if (inRobot.pose & Robot.TURN_COUNTERCLOCKWISE) {
-		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
-		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
-
-		setRotationX(inRobot, ['leftleg'], -0.3);
-		setRotationX(inRobot, ['rightleg'], 0);
-		setRotationX(inRobot, ['leftleg', 'shin'], -0.5);
-		setRotationX(inRobot, ['rightleg', 'shin'], 0);
-		setRotationY(inRobot, ['head'], -0.5);
-
-		setRotationX(inRobot, ['leftarm'], 0.3);
-		setRotationX(inRobot, ['leftarm', 'forearm'], 0.6);
-		setRotationX(inRobot, ['rightarm'], -0.4);
-		setRotationX(inRobot, ['rightarm', 'forearm'], 0.4);
-
+		setTurnCounterclockwisePoseTargets(inRobot);
 		document.getElementById('jet').play();
 	} else if (inRobot.pose & Robot.FLOAT) {
-		setRotationX(inRobot, ['leftleg'], 0);
-		setRotationX(inRobot, ['rightleg'], 0);
-		setRotationX(inRobot, ['leftleg', 'shin'], 0);
-		setRotationX(inRobot, ['rightleg', 'shin'], 0);
-		setRotationY(inRobot, ['head'], 0);
-
-		setRotationX(inRobot, ['rightarm'], 0);
-		setRotationX(inRobot, ['rightarm', 'forearm'], 0);
-		setRotationX(inRobot, ['leftarm'], 0);
-		setRotationX(inRobot, ['leftarm', 'forearm'], 0);
-
-		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
-		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
+		setFloatPoseTargets(inRobot);
 		document.getElementById('jet').pause();
 	} else if (inRobot.pose & Robot.PUNCH) {
-		setRotationX(inRobot, ['rightarm'], 1.3);
-		setRotationX(inRobot, ['rightarm', 'forearm'], 0.5);
-
-		setLightIntensity(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
-		setLightIntensity(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
-		setRotationY(inRobot, ['head'], 0);
+		setPunchPoseTargets(inRobot);
 		document.getElementById('jet').pause();
 	}
 }
@@ -819,7 +891,34 @@ function parseKeyboardCommands(inRobot, inEvent) {
 	}
 }
 
-function update(inRobot)
+// update the rotation and light intensity angles to match the targets
+function updatePose(inRobot) {
+	for (var pathString in inRobot.poseTargets.xrotation) {
+		objectPath = pathString.split(",");
+		var currentRotation = getRotationX(inRobot, objectPath);
+		var targetRotation = inRobot.poseTargets.xrotation[pathString];
+
+		setRotationX(inRobot, objectPath, (currentRotation + targetRotation) / 2.0);
+	}
+
+	for (var pathString in inRobot.poseTargets.yrotation) {
+		objectPath = pathString.split(",");
+		var currentRotation = getRotationY(inRobot, objectPath);
+		var targetRotation = inRobot.poseTargets.yrotation[pathString];
+
+		setRotationY(inRobot, objectPath, (currentRotation + targetRotation) / 2.0);
+	}
+
+	for (var pathString in inRobot.poseTargets.lightintensity) {
+		objectPath = pathString.split(",");
+		var currentIntensity = getLightIntensity(inRobot, objectPath);
+		var targetIntensity = inRobot.poseTargets.lightintensity[pathString];
+
+		setLightIntensity(inRobot, objectPath, (currentIntensity + targetIntensity) / 2.0);
+	}	
+}
+
+function updateVelocity(inRobot)
 {
 	var delta = clock.getDelta(); // seconds.
 	var moveDistance = delta * inRobot.velocity; // 200 pixels per second
