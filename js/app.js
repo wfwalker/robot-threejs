@@ -490,8 +490,8 @@ function createGloomyWorld(inScene) {
 	// SKYBOX/FOG
 	var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
 	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x555555, side: THREE.BackSide } );
-	var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
-	inScene.add(skyBox);
+	Robot.skybox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
+	inScene.add(Robot.skybox);
 	inScene.fog = new THREE.FogExp2( 0x555555, 0.0005 );
 
 	// floating platforms	
@@ -522,9 +522,9 @@ function createSunlitWorld(inScene) {
 	
 	var skyboxGeom = new THREE.CubeGeometry( 10000, 10000, 10000, 1, 1, 1 );
 	
-	var skybox = new THREE.Mesh( skyboxGeom, skyboxMaterial );
+	Robot.skybox = new THREE.Mesh( skyboxGeom, skyboxMaterial );
 
-	inScene.add( skybox );	
+	inScene.add( Robot.skybox );	
 	inScene.fog = new THREE.FogExp2( 0x999999, 0.0002 );
 
 	// floating platforms	
@@ -925,6 +925,8 @@ function updateVelocity(inRobot)
 	var rotateAngle = Math.PI / 2 * inRobot.radialVelocity;   // pi/2 radians (90 degrees) per second
 	var rotation_matrix = new THREE.Matrix4().identity();
 
+	Robot.skybox.position = inRobot.position;
+
 	// always moving
 	inRobot.translateZ( moveDistance );
 
@@ -964,7 +966,9 @@ function updateVelocity(inRobot)
 }
 
 function cameraChases(inRobot) {
-	var relativeCameraOffset = new THREE.Vector3(10,300,300);
+	var panClock = Date.now() / 1400.0; 
+	//TODO have target chase camera angle and distance for each pose! brilliant!
+	var relativeCameraOffset = new THREE.Vector3(10 + 1 * Math.sin(panClock), 300, 300 + 10 * Math.cos(panClock));
 
 	var cameraOffset = relativeCameraOffset.applyMatrix4( inRobot.matrixWorld );
 
