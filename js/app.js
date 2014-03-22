@@ -16,6 +16,7 @@ var clock = new THREE.Clock();
 var Robot = {};
 
 init();
+initAudio();
 animate();
 
 // consider using http://evanw.github.com/csg.js/docs/
@@ -455,7 +456,7 @@ function createFlare(inName) {
 	lightCylinder.position.set(0, 6, 0);
 	light.add(lightCylinder);
 
-	var lightSource = new THREE.PointLight(0xff0000);
+	var lightSource = new THREE.PointLight(0xff9999);
 	lightSource.position.set(0, 0, 0);
 	lightSource.name = 'source';
 	light.add(lightSource);
@@ -579,8 +580,8 @@ function init()
 	var wireframeMaterial2 = new THREE.MeshBasicMaterial( { color: 0x888888, wireframe: true, transparent: true } ); 
 	Robot.lightFrame = [ lightMaterial, lightMaterial ]; 
 
-	var flareMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, specular: 0xffffff, ambient: 0xffffff } );
-	var wireframeMaterial2 = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true, transparent: true } ); 
+	var flareMaterial = new THREE.MeshBasicMaterial( { color: 0xff9999, specular: 0xffffff, ambient: 0xffffff } );
+	var wireframeMaterial2 = new THREE.MeshBasicMaterial( { color: 0xff9999, wireframe: true, transparent: true } ); 
 	Robot.flareFrame = [ flareMaterial, flareMaterial ]; 
 
 	// SCENE
@@ -631,6 +632,35 @@ function init()
 	document.addEventListener("keyup", function (e) {
 		parseKeyboardCommands(bob, e);
 	});
+
+}
+
+function initAudio() {
+	// wire up sound
+	window.AudioContext = window.AudioContext||window.webkitAudioContext;
+	context = new AudioContext();
+	console.log("created audio context");
+	console.log(context);
+
+	var bufferSize = 2 * context.sampleRate;
+	noiseBuffer = context.createBuffer(1, bufferSize, context.sampleRate);
+	output = noiseBuffer.getChannelData(0);
+	for (var i = 0; i < bufferSize; i++) {
+		output[i] = Math.random() * 2 - 1;
+	}
+
+	var whiteNoise = context.createBufferSource();
+	whiteNoise.buffer = noiseBuffer;
+	whiteNoise.loop = true;
+
+	// create gain, wire up to noise
+	Robot.engineGain = context.createGain();
+	whiteNoise.connect(Robot.engineGain);
+	Robot.engineGain.connect(context.destination);
+
+	// initialize gain.gain, start whitenoise
+	Robot.engineGain.gain.value = 0;
+	whiteNoise.start(0);
 }
 
 function animate() 
@@ -840,22 +870,22 @@ function setPunchPoseTargets(inRobot) {
 function pose(inRobot) {
 	if (inRobot.pose & Robot.PUSH_FORWARDS) {
 		setPushForwardsPoseTargets(inRobot);
-		document.getElementById('jet').play();
+		if (Robot.engineGain) { Robot.engineGain.gain.value = 1; }
 	} else if (inRobot.pose & Robot.PUSH_BACKWARDS) {
 		setPushBckwardsPoseTargets(inRobot);
-		document.getElementById('jet').play();
+		if (Robot.engineGain) { Robot.engineGain.gain.value = 1; }
 	} else if (inRobot.pose & Robot.TURN_CLOCKWISE) {
 		setTurnClockwisePoseTargets(inRobot);
-		document.getElementById('jet').play();
+		if (Robot.engineGain) { Robot.engineGain.gain.value = 1; }
 	} else if (inRobot.pose & Robot.TURN_COUNTERCLOCKWISE) {
 		setTurnCounterclockwisePoseTargets(inRobot);
-		document.getElementById('jet').play();
+		if (Robot.engineGain) { Robot.engineGain.gain.value = 1; }
 	} else if (inRobot.pose & Robot.FLOAT) {
 		setFloatPoseTargets(inRobot);
-		document.getElementById('jet').pause();
+		if (Robot.engineGain) { Robot.engineGain.gain.value = 0; }
 	} else if (inRobot.pose & Robot.PUNCH) {
 		setPunchPoseTargets(inRobot);
-		document.getElementById('jet').pause();
+		if (Robot.engineGain) { Robot.engineGain.gain.value = 0; }
 	}
 }
 
@@ -925,6 +955,7 @@ function updateVelocity(inRobot)
 	var rotateAngle = Math.PI / 2 * inRobot.radialVelocity;   // pi/2 radians (90 degrees) per second
 	var rotation_matrix = new THREE.Matrix4().identity();
 
+	// center the skybox around the robot, so we don't run off the edge of it.
 	Robot.skybox.position = inRobot.position;
 
 	// always moving
