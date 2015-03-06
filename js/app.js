@@ -870,22 +870,16 @@ function setPunchPoseTargets(inRobot) {
 function pose(inRobot) {
 	if (inRobot.pose & Robot.PUSH_FORWARDS) {
 		setPushForwardsPoseTargets(inRobot);
-		if (Robot.engineGain) { Robot.engineGain.gain.value = 1; }
 	} else if (inRobot.pose & Robot.PUSH_BACKWARDS) {
 		setPushBckwardsPoseTargets(inRobot);
-		if (Robot.engineGain) { Robot.engineGain.gain.value = 1; }
 	} else if (inRobot.pose & Robot.TURN_CLOCKWISE) {
 		setTurnClockwisePoseTargets(inRobot);
-		if (Robot.engineGain) { Robot.engineGain.gain.value = 1; }
 	} else if (inRobot.pose & Robot.TURN_COUNTERCLOCKWISE) {
 		setTurnCounterclockwisePoseTargets(inRobot);
-		if (Robot.engineGain) { Robot.engineGain.gain.value = 1; }
 	} else if (inRobot.pose & Robot.FLOAT) {
 		setFloatPoseTargets(inRobot);
-		if (Robot.engineGain) { Robot.engineGain.gain.value = 0; }
 	} else if (inRobot.pose & Robot.PUNCH) {
 		setPunchPoseTargets(inRobot);
-		if (Robot.engineGain) { Robot.engineGain.gain.value = 0; }
 	}
 }
 
@@ -992,6 +986,8 @@ function updateVelocity(inRobot)
 		// Slow Down! unless pushing
 		inRobot.velocity = 0.95 * inRobot.velocity;
 	}
+
+	Robot.engineGain.gain.value = Math.abs(inRobot.velocity / 1200) + Math.abs(inRobot.radialVelocity / 0.05);
 
 	document.getElementById('speedometer').innerHTML = Math.round(inRobot.velocity);
 }
