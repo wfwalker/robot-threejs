@@ -192,33 +192,7 @@ function animate()
 	bob.updateVelocity();
 	bob.updatePose();
 
-	cameraChases(bob);
-}
-
-function cameraChases(inRobot) {
-	var panClock = Date.now() / 1400.0; 
-
-	//TODO have target chase camera angle and distance for each pose! brilliant!
-
-	relativeCameraOffset.x = 10 + 1 * Math.sin(panClock);
-	relativeCameraOffset.y = 300;
-	relativeCameraOffset.z = 300 + 10 * Math.cos(panClock);
-
-	var cameraOffset = relativeCameraOffset.applyMatrix4( inRobot.model.matrixWorld );
-
-	camera.position.x = cameraOffset.x;
-	camera.position.y = cameraOffset.y;
-	camera.position.z = cameraOffset.z;	
-
-	targetPosition.x = inRobot.model.position.x;
-	targetPosition.y = inRobot.model.position.y + 170;
-	targetPosition.z = inRobot.model.position.z;
-	camera.lookAt( targetPosition );
-	
-	camera.updateMatrix();
-	camera.updateProjectionMatrix();
-			
-	stats.update();
+	bob.cameraChases(camera);
 }
 
 function render() 

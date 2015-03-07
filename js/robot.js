@@ -769,3 +769,30 @@ Robot.prototype.updateVelocity = function()
 
 	document.getElementById('speedometer').innerHTML = Math.round(this.velocity);
 }
+
+Robot.prototype.cameraChases = function(inCamera) {
+	var panClock = Date.now() / 1400.0; 
+
+	//TODO have target chase camera angle and distance for each pose! brilliant!
+
+	relativeCameraOffset.x = 10 + 1 * Math.sin(panClock);
+	relativeCameraOffset.y = 300;
+	relativeCameraOffset.z = 300 + 10 * Math.cos(panClock);
+
+	var cameraOffset = relativeCameraOffset.applyMatrix4( this.model.matrixWorld );
+
+	inCamera.position.x = cameraOffset.x;
+	inCamera.position.y = cameraOffset.y;
+	inCamera.position.z = cameraOffset.z;	
+
+	targetPosition.x = this.model.position.x;
+	targetPosition.y = this.model.position.y + 170;
+	targetPosition.z = this.model.position.z;
+	inCamera.lookAt( targetPosition );
+	
+	inCamera.updateMatrix();
+	inCamera.updateProjectionMatrix();
+			
+	stats.update();
+}
+
