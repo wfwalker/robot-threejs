@@ -5,7 +5,7 @@
 // MAIN
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 // standard global variables
-var container, scene, camera, renderer, controls, stats;
+var container, scene, camera, renderer;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 var bob = new Robot("bob");
@@ -14,7 +14,6 @@ var angus = new Robot("angus");
 // Do not recreate these for every frame!
 var relativeCameraOffset = new THREE.Vector3();
 var targetPosition = new THREE.Vector3();
-
 
 // custom global variables
 
@@ -176,7 +175,7 @@ function animate()
 		var aRobot = Robot.robots[index];
 
 	    if (aRobot.currentPose == Robot.FLOAT) {
-		    aRobot.model.position.y = 4*Math.sin(index * 1000 + Date.now()/700)+2;    	
+		    aRobot.model.position.y = 4*Math.sin(index * 1000 + clock.elapsedTime/700)+2;    	
 	    }
     }
 

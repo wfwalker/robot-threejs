@@ -57,7 +57,7 @@ Robot.TURN_CLOCKWISE = 8;
 Robot.TURN_COUNTERCLOCKWISE = 16;
 Robot.PUNCH = 32;
 
-// global collection of all robot models
+// global collection of all robots
 Robot.robots = [];
 
 // GLOBAL TEXTURES
@@ -664,8 +664,6 @@ Robot.prototype.pose = function() {
 }
 
 Robot.prototype.parseKeyboardCommands = function(inEvent) {
-	console.log("PARSE");
-
 	newPose = 0;
 
 	// move forwards/backwards/left/right
@@ -773,7 +771,7 @@ Robot.prototype.updateVelocity = function()
 }
 
 Robot.prototype.cameraChases = function(inCamera) {
-	var panClock = Date.now() / 1400.0; 
+	var panClock = clock.elapsedTime / 1400.0;
 
 	//TODO have target chase camera angle and distance for each pose! brilliant!
 
@@ -794,7 +792,5 @@ Robot.prototype.cameraChases = function(inCamera) {
 	
 	inCamera.updateMatrix();
 	inCamera.updateProjectionMatrix();
-			
-	stats.update();
 }
 
