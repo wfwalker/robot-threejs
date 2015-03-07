@@ -3,7 +3,7 @@
 var Robot = function(inName) {
 	this.model = new THREE.Object3D();
 
-	this.pose = Robot.FLOAT;
+	this.currentPose = Robot.FLOAT;
 
 	var body = this.createBody();
 	body.position.set(0, 130, 0);
@@ -31,19 +31,21 @@ var Robot = function(inName) {
 
 	this.model.name = inName;
 
-	this.model.velocity = 0;
-	this.model.radialVelocity = 0;
-	this.model.maxVelocity = 600;
-	this.model.acceleration = 10;
-	this.model.maxRadialVelocity = 0.025;
-	this.model.radialAcceleration = 0.0015;
+	this.velocity = 0;
+	this.radialVelocity = 0;
+	this.maxVelocity = 600;
+	this.acceleration = 10;
+	this.maxRadialVelocity = 0.025;
+	this.radialAcceleration = 0.0015;
 
-	this.model.poseTargets = {};
-	this.model.poseTargets.xrotation = {};
-	this.model.poseTargets.yrotation = {};
-	this.model.poseTargets.lightintensity = {};
+	this.poseTargets = {};
+	this.poseTargets.xrotation = {};
+	this.poseTargets.yrotation = {};
+	this.poseTargets.lightintensity = {};
 
-	Robot.robots.push(this.model);
+	Robot.robots.push(this);
+
+	return this;
 }
 
 // GLOBAL States
@@ -458,4 +460,315 @@ Robot.prototype.createArm = function(inName) {
 	arm.name = inName;
 
 	return arm;
+}
+
+
+Robot.prototype.hide = function(inPath) {
+	var toBeHidden = this.model;
+	for (var index = 0; index < inPath.length; index++) {
+		toBeHidden = toBeHidden.getChildByName(inPath[index]);
+	}
+
+	toBeHidden.traverse(function (obj) {
+		obj.visible = false;
+	})
+}
+
+Robot.prototype.show = function(inPath) {
+	var toBeHidden = this.model;
+	for (var index = 0; index < inPath.length; index++) {
+		toBeHidden = toBeHidden.getChildByName(inPath[index]);
+	}
+
+	toBeHidden.traverse(function (obj) {
+		obj.visible = true;
+	})
+}
+
+// set the target x rotation of the object at the specified object path to the given angle
+Robot.prototype.setRotationXTarget = function(inObjectPath, inAngle) {
+	this.poseTargets.xrotation[inObjectPath] = inAngle;
+}
+
+// set the target x rotation of the object at the specified object path to the given angle
+Robot.prototype.setRotationYTarget = function(inObjectPath, inAngle) {
+	this.poseTargets.yrotation[inObjectPath] = inAngle;
+}
+
+// set the target light intensity of the object at the specified object path to the given angle
+Robot.prototype.setLightIntensityTarget = function(inObjectPath, inAngle) {
+	this.poseTargets.lightintensity[inObjectPath] = inAngle;
+}
+
+Robot.prototype.getRotationX = function(inPath) {
+	var toRotate = this.model;
+	for (var index = 0; index < inPath.length; index++) {
+		toRotate = toRotate.getChildByName(inPath[index]);
+	}
+
+	return toRotate.rotation.x;
+}
+
+Robot.prototype.setRotationX = function(inPath, inAngle) {
+	var toRotate = this.model;
+	for (var index = 0; index < inPath.length; index++) {
+		toRotate = toRotate.getChildByName(inPath[index]);
+	}
+
+	toRotate.rotation.x = inAngle;
+}
+
+Robot.prototype.getRotationY = function(inPath) {
+	var toRotate = this.model;
+	for (var index = 0; index < inPath.length; index++) {
+		toRotate = toRotate.getChildByName(inPath[index]);
+	}
+
+	return toRotate.rotation.y;
+}
+
+Robot.prototype.setRotationY = function(inPath, inAngle) {
+	var toRotate = this.model;
+	for (var index = 0; index < inPath.length; index++) {
+		toRotate = toRotate.getChildByName(inPath[index]);
+	}
+
+	toRotate.rotation.y = inAngle;
+}
+
+Robot.prototype.getLightIntensity = function(inPath) {
+	var toRotate = this.model;
+	for (var index = 0; index < inPath.length; index++) {
+		toRotate = toRotate.getChildByName(inPath[index]);
+	}
+
+	return toRotate.intensity;
+}
+
+Robot.prototype.setLightIntensity = function(inPath, inIntensity) {
+	var toBeHidden = this.model;
+	for (var index = 0; index < inPath.length; index++) {
+		toBeHidden = toBeHidden.getChildByName(inPath[index]);
+	}
+
+	toBeHidden.traverse(function (obj) {
+		obj.intensity = inIntensity;
+	})
+}
+
+Robot.prototype.setPushForwardsPoseTargets = function() {
+	this.setRotationXTarget(['leftleg'], -0.3);
+	this.setRotationXTarget(['rightleg'], -0.3);
+	this.setRotationXTarget(['leftleg', 'shin'], -0.5);
+	this.setRotationXTarget(['rightleg', 'shin'], -0.5);
+	this.setRotationYTarget(['head'], 0);
+
+	this.setRotationXTarget(['rightarm'], -0.4);
+	this.setRotationXTarget(['rightarm', 'forearm'], 0.4);
+	this.setRotationXTarget(['leftarm'], -0.4);
+	this.setRotationXTarget(['leftarm', 'forearm'], 0.4);
+
+	this.setLightIntensityTarget(['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
+	this.setLightIntensityTarget(['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
+}
+
+Robot.prototype.setPushBckwardsPoseTargets = function() {
+	this.setRotationXTarget(['leftleg'], 0.7);
+	this.setRotationXTarget(['rightleg'], 0.7);
+	this.setRotationXTarget(['leftleg', 'shin'], -0.5);
+	this.setRotationXTarget(['rightleg', 'shin'], -0.5);
+	this.setRotationYTarget(['head'], 0);
+
+	this.setRotationXTarget(['rightarm'], -0.3);
+	this.setRotationXTarget(['rightarm', 'forearm'], 1.1);
+	this.setRotationXTarget(['leftarm'], -0.3);
+	this.setRotationXTarget(['leftarm', 'forearm'], 1.1);
+
+	this.setLightIntensityTarget(['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
+	this.setLightIntensityTarget(['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
+}
+
+Robot.prototype.setTurnClockwisePoseTargets = function() {
+	this.setRotationXTarget(['leftleg'], 0);
+	this.setRotationXTarget(['rightleg'], -0.3);
+	this.setRotationXTarget(['leftleg', 'shin'], 0);
+	this.setRotationXTarget(['rightleg', 'shin'], -0.5);
+	this.setRotationYTarget(['head'], 0.5);
+
+	this.setRotationXTarget(['rightarm'], 0.3);
+	this.setRotationXTarget(['rightarm', 'forearm'], 0.6);
+	this.setRotationXTarget(['leftarm'], -0.4);
+	this.setRotationXTarget(['leftarm', 'forearm'], 0.4);
+
+	this.setLightIntensityTarget(['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
+	this.setLightIntensityTarget(['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
+}
+
+Robot.prototype.setTurnCounterclockwisePoseTargets = function() {
+	this.setRotationXTarget(['leftleg'], -0.3);
+	this.setRotationXTarget(['rightleg'], 0);
+	this.setRotationXTarget(['leftleg', 'shin'], -0.5);
+	this.setRotationXTarget(['rightleg', 'shin'], 0);
+	this.setRotationYTarget(['head'], -0.5);
+
+	this.setRotationXTarget(['rightarm'], -0.4);
+	this.setRotationXTarget(['rightarm', 'forearm'], 0.4);
+	this.setRotationXTarget(['leftarm'], -0.3);
+	this.setRotationXTarget(['leftarm', 'forearm'], 0.6);
+
+	this.setLightIntensityTarget(['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
+	this.setLightIntensityTarget(['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
+}
+
+Robot.prototype.setFloatPoseTargets = function() {
+	this.setRotationXTarget(['leftleg'], 0);
+	this.setRotationXTarget(['rightleg'], 0);
+	this.setRotationXTarget(['leftleg', 'shin'], 0);
+	this.setRotationXTarget(['rightleg', 'shin'], 0);
+
+	this.setRotationYTarget(['head'], 0);
+
+	this.setRotationXTarget(['rightarm'], 0);
+	this.setRotationXTarget(['rightarm', 'forearm'], 0);
+	this.setRotationXTarget(['leftarm'], 0);
+	this.setRotationXTarget(['leftarm', 'forearm'], 0);
+
+	this.setLightIntensityTarget(['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
+	this.setLightIntensityTarget(['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
+}
+
+Robot.prototype.setPunchPoseTargets = function() {
+	this.setRotationXTarget(['rightarm'], 1.3);
+	this.setRotationXTarget(['rightarm', 'forearm'], 0.5);
+
+	this.setRotationYTarget(['head'], 0);
+
+	this.setLightIntensityTarget(['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
+	this.setLightIntensityTarget(['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
+}
+
+Robot.prototype.pose = function() {
+	if (this.currentPose & Robot.PUSH_FORWARDS) {
+		this.setPushForwardsPoseTargets();
+	} else if (this.currentPose & Robot.PUSH_BACKWARDS) {
+		this.setPushBckwardsPoseTargets();
+	} else if (this.currentPose & Robot.TURN_CLOCKWISE) {
+		this.setTurnClockwisePoseTargets();
+	} else if (this.currentPose & Robot.TURN_COUNTERCLOCKWISE) {
+		this.setTurnCounterclockwisePoseTargets();
+	} else if (this.currentPose & Robot.FLOAT) {
+		this.setFloatPoseTargets();
+	} else if (this.currentPose & Robot.PUNCH) {
+		this.setPunchPoseTargets();
+	}
+}
+
+Robot.prototype.parseKeyboardCommands = function(inEvent) {
+	console.log("PARSE");
+
+	newPose = 0;
+
+	// move forwards/backwards/left/right
+	if ( keyboard.pressed("W") ) {
+		newPose = newPose | Robot.PUSH_FORWARDS;
+	} 
+	if ( keyboard.pressed("S") ) {
+		newPose = newPose | Robot.PUSH_BACKWARDS;
+	} 
+	if ( keyboard.pressed("A") ) {
+		newPose = newPose | Robot.TURN_CLOCKWISE;
+	} 
+	if ( keyboard.pressed("D") ) {
+		newPose = newPose | Robot.TURN_COUNTERCLOCKWISE;
+	} 
+	if ( keyboard.pressed("2") ) {
+		newPose = newPose | Robot.PUNCH;
+	}  
+	if (newPose == 0) {
+		newPose = Robot.FLOAT;
+	}
+
+	if (this.pose != newPose) {
+		console.log("CHANGE POSE TO " + newPose);
+		this.currentPose = newPose;
+		this.pose();	
+	}
+}
+
+// update the rotation and light intensity angles to match the targets
+Robot.prototype.updatePose = function() {
+	for (var pathString in this.poseTargets.xrotation) {
+		objectPath = pathString.split(",");
+		var currentRotation = this.getRotationX(objectPath);
+		var targetRotation = this.poseTargets.xrotation[pathString];
+
+		this.setRotationX(objectPath, (currentRotation + targetRotation) / 2.0);
+	}
+
+	for (var pathString in this.poseTargets.yrotation) {
+		objectPath = pathString.split(",");
+		var currentRotation = this.getRotationY(objectPath);
+		var targetRotation = this.poseTargets.yrotation[pathString];
+
+		this.setRotationY(objectPath, (currentRotation + targetRotation) / 2.0);
+	}
+
+	for (var pathString in this.poseTargets.lightintensity) {
+		objectPath = pathString.split(",");
+		var currentIntensity = this.getLightIntensity(objectPath);
+		var targetIntensity = this.poseTargets.lightintensity[pathString];
+
+		this.setLightIntensity(objectPath, (currentIntensity + targetIntensity) / 2.0);
+	}	
+}
+
+Robot.prototype.updateVelocity = function()
+{
+	var delta = clock.getDelta(); // seconds.
+	var moveDistance = delta * this.velocity; // 200 pixels per second
+	var rotateAngle = Math.PI / 2 * this.radialVelocity;   // pi/2 radians (90 degrees) per second
+	var rotation_matrix = new THREE.Matrix4().identity();
+
+	// center the skybox around the robot, so we don't run off the edge of it.
+	Robot.skybox.position = this.model.position;
+
+	// always moving
+	this.model.translateZ( moveDistance );
+
+	// always rotating
+	rotation_matrix = new THREE.Matrix4().makeRotationY(rotateAngle);
+	this.model.matrix.multiply(rotation_matrix);
+	this.model.rotation.setEulerFromRotationMatrix(this.model.matrix);
+
+	// move forwards/backwards/left/right
+	if (this.currentPose & Robot.PUSH_FORWARDS) {
+		this.velocity = Math.max(-this.maxVelocity, this.velocity - this.acceleration);
+		this.radialVelocity = 0.9 * this.radialVelocity;
+	} 
+	if (this.currentPose & Robot.PUSH_BACKWARDS) {
+		this.radialVelocity = 0.9 * this.radialVelocity;
+		this.velocity = Math.min(this.maxVelocity, this.velocity + this.acceleration);
+	} 
+	
+	if (this.currentPose & Robot.TURN_CLOCKWISE) {
+		this.radialVelocity = Math.min(this.maxRadialVelocity, this.radialVelocity + this.radialAcceleration);
+	} 
+	if (this.currentPose & Robot.TURN_COUNTERCLOCKWISE) {
+		this.radialVelocity = Math.max(-this.maxRadialVelocity, this.radialVelocity - this.radialAcceleration);
+	} 
+
+	if (!(this.currentPose & Robot.TURN_CLOCKWISE || this.currentPose & Robot.TURN_COUNTERCLOCKWISE)) {
+		// Slow Down! unless pushing
+		this.radialVelocity = 0.9 * this.radialVelocity;
+	}
+
+	if (!(this.currentPose & Robot.PUSH_BACKWARDS || this.currentPose & Robot.PUSH_FORWARDS)) {
+		// Slow Down! unless pushing
+		this.velocity = 0.95 * this.velocity;
+	}
+
+	// set the engine sound based on both radial and forward velocity
+	Robot.engineGain.gain.value = Math.abs(this.velocity / 1200) + Math.abs(this.radialVelocity / 0.05);
+
+	document.getElementById('speedometer').innerHTML = Math.round(this.velocity);
 }

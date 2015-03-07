@@ -8,6 +8,8 @@ if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 var container, scene, camera, renderer, controls, stats;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
+var bob = new Robot("bob");
+var angus = new Robot("angus");
 
 // custom global variables
 
@@ -125,19 +127,17 @@ function init()
 	createGloomyWorld(scene);
 	// createSunlitWorld(scene);
 
-	var bob = new Robot("bob");
 	scene.add(bob.model);
 
-	var angus = new Robot("angus");
 	angus.model.position.set(300, 0, 0);
-	pose(angus.model);
+	angus.pose();
 	scene.add(angus.model);
 
 	document.addEventListener("keydown", function (e) {
-		parseKeyboardCommands(bob.model, e);
+		bob.parseKeyboardCommands(e);
 	});
 	document.addEventListener("keyup", function (e) {
-		parseKeyboardCommands(bob.model, e);
+		bob.parseKeyboardCommands(e);
 	});
 
 }
@@ -184,320 +184,10 @@ function animate()
 
 	render();		
 
-	updateVelocity(Robot.robots[0]);
-	updatePose(Robot.robots[0]);
+	bob.updateVelocity();
+	bob.updatePose();
 
-	cameraChases(Robot.robots[0]);
-}
-
-function hide(inRobot, inPath) {
-	var toBeHidden = inRobot;
-	for (var index = 0; index < inPath.length; index++) {
-		toBeHidden = toBeHidden.getChildByName(inPath[index]);
-	}
-
-	toBeHidden.traverse(function (obj) {
-		obj.visible = false;
-	})
-}
-
-function show(inRobot, inPath) {
-	var toBeHidden = inRobot;
-	for (var index = 0; index < inPath.length; index++) {
-		toBeHidden = toBeHidden.getChildByName(inPath[index]);
-	}
-
-	toBeHidden.traverse(function (obj) {
-		obj.visible = true;
-	})
-}
-
-// set the target x rotation of the object at the specified object path to the given angle
-function setRotationXTarget(inRobot, inObjectPath, inAngle) {
-	inRobot.poseTargets.xrotation[inObjectPath] = inAngle;
-}
-
-// set the target x rotation of the object at the specified object path to the given angle
-function setRotationYTarget(inRobot, inObjectPath, inAngle) {
-	inRobot.poseTargets.yrotation[inObjectPath] = inAngle;
-}
-
-// set the target light intensity of the object at the specified object path to the given angle
-function setLightIntensityTarget(inRobot, inObjectPath, inAngle) {
-	inRobot.poseTargets.lightintensity[inObjectPath] = inAngle;
-}
-
-function getRotationX(inRobot, inPath) {
-	var toRotate = inRobot;
-	for (var index = 0; index < inPath.length; index++) {
-		toRotate = toRotate.getChildByName(inPath[index]);
-	}
-
-	return toRotate.rotation.x;
-}
-
-function setRotationX(inRobot, inPath, inAngle) {
-	var toRotate = inRobot;
-	for (var index = 0; index < inPath.length; index++) {
-		toRotate = toRotate.getChildByName(inPath[index]);
-	}
-
-	toRotate.rotation.x = inAngle;
-}
-
-function getRotationY(inRobot, inPath) {
-	var toRotate = inRobot;
-	for (var index = 0; index < inPath.length; index++) {
-		toRotate = toRotate.getChildByName(inPath[index]);
-	}
-
-	return toRotate.rotation.y;
-}
-
-function setRotationY(inRobot, inPath, inAngle) {
-	var toRotate = inRobot;
-	for (var index = 0; index < inPath.length; index++) {
-		toRotate = toRotate.getChildByName(inPath[index]);
-	}
-
-	toRotate.rotation.y = inAngle;
-}
-
-function getLightIntensity(inRobot, inPath) {
-	var toRotate = inRobot;
-	for (var index = 0; index < inPath.length; index++) {
-		toRotate = toRotate.getChildByName(inPath[index]);
-	}
-
-	return toRotate.intensity;
-}
-
-function setLightIntensity(inRobot, inPath, inIntensity) {
-	var toBeHidden = inRobot;
-	for (var index = 0; index < inPath.length; index++) {
-		toBeHidden = toBeHidden.getChildByName(inPath[index]);
-	}
-
-	toBeHidden.traverse(function (obj) {
-		obj.intensity = inIntensity;
-	})
-}
-
-function setPushForwardsPoseTargets(inRobot) {
-	setRotationXTarget(inRobot, ['leftleg'], -0.3);
-	setRotationXTarget(inRobot, ['rightleg'], -0.3);
-	setRotationXTarget(inRobot, ['leftleg', 'shin'], -0.5);
-	setRotationXTarget(inRobot, ['rightleg', 'shin'], -0.5);
-	setRotationYTarget(inRobot, ['head'], 0);
-
-	setRotationXTarget(inRobot, ['rightarm'], -0.4);
-	setRotationXTarget(inRobot, ['rightarm', 'forearm'], 0.4);
-	setRotationXTarget(inRobot, ['leftarm'], -0.4);
-	setRotationXTarget(inRobot, ['leftarm', 'forearm'], 0.4);
-
-	setLightIntensityTarget(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
-	setLightIntensityTarget(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
-}
-
-function setPushBckwardsPoseTargets(inRobot) {
-	setRotationXTarget(inRobot, ['leftleg'], 0.7);
-	setRotationXTarget(inRobot, ['rightleg'], 0.7);
-	setRotationXTarget(inRobot, ['leftleg', 'shin'], -0.5);
-	setRotationXTarget(inRobot, ['rightleg', 'shin'], -0.5);
-	setRotationYTarget(inRobot, ['head'], 0);
-
-	setRotationXTarget(inRobot, ['rightarm'], -0.3);
-	setRotationXTarget(inRobot, ['rightarm', 'forearm'], 1.1);
-	setRotationXTarget(inRobot, ['leftarm'], -0.3);
-	setRotationXTarget(inRobot, ['leftarm', 'forearm'], 1.1);
-
-	setLightIntensityTarget(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
-	setLightIntensityTarget(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
-}
-
-function setTurnClockwisePoseTargets(inRobot) {
-	setRotationXTarget(inRobot, ['leftleg'], 0);
-	setRotationXTarget(inRobot, ['rightleg'], -0.3);
-	setRotationXTarget(inRobot, ['leftleg', 'shin'], 0);
-	setRotationXTarget(inRobot, ['rightleg', 'shin'], -0.5);
-	setRotationYTarget(inRobot, ['head'], 0.5);
-
-	setRotationXTarget(inRobot, ['rightarm'], 0.3);
-	setRotationXTarget(inRobot, ['rightarm', 'forearm'], 0.6);
-	setRotationXTarget(inRobot, ['leftarm'], -0.4);
-	setRotationXTarget(inRobot, ['leftarm', 'forearm'], 0.4);
-
-	setLightIntensityTarget(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
-	setLightIntensityTarget(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
-}
-
-function setTurnCounterclockwisePoseTargets(inRobot) {
-	setRotationXTarget(inRobot, ['leftleg'], -0.3);
-	setRotationXTarget(inRobot, ['rightleg'], 0);
-	setRotationXTarget(inRobot, ['leftleg', 'shin'], -0.5);
-	setRotationXTarget(inRobot, ['rightleg', 'shin'], 0);
-	setRotationYTarget(inRobot, ['head'], -0.5);
-
-	setRotationXTarget(inRobot, ['rightarm'], -0.4);
-	setRotationXTarget(inRobot, ['rightarm', 'forearm'], 0.4);
-	setRotationXTarget(inRobot, ['leftarm'], -0.3);
-	setRotationXTarget(inRobot, ['leftarm', 'forearm'], 0.6);
-
-	setLightIntensityTarget(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 1.0);
-	setLightIntensityTarget(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
-}
-
-function setFloatPoseTargets(inRobot) {
-	setRotationXTarget(inRobot, ['leftleg'], 0);
-	setRotationXTarget(inRobot, ['rightleg'], 0);
-	setRotationXTarget(inRobot, ['leftleg', 'shin'], 0);
-	setRotationXTarget(inRobot, ['rightleg', 'shin'], 0);
-
-	setRotationYTarget(inRobot, ['head'], 0);
-
-	setRotationXTarget(inRobot, ['rightarm'], 0);
-	setRotationXTarget(inRobot, ['rightarm', 'forearm'], 0);
-	setRotationXTarget(inRobot, ['leftarm'], 0);
-	setRotationXTarget(inRobot, ['leftarm', 'forearm'], 0);
-
-	setLightIntensityTarget(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
-	setLightIntensityTarget(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
-}
-
-function setPunchPoseTargets(inRobot) {
-	setRotationXTarget(inRobot, ['rightarm'], 1.3);
-	setRotationXTarget(inRobot, ['rightarm', 'forearm'], 0.5);
-
-	setRotationYTarget(inRobot, ['head'], 0);
-
-	setLightIntensityTarget(inRobot, ['leftleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
-	setLightIntensityTarget(inRobot, ['rightleg', 'shin', 'shinJet', 'flare', 'source'], 0.1);
-}
-
-function pose(inRobot) {
-	if (inRobot.pose & Robot.PUSH_FORWARDS) {
-		setPushForwardsPoseTargets(inRobot);
-	} else if (inRobot.pose & Robot.PUSH_BACKWARDS) {
-		setPushBckwardsPoseTargets(inRobot);
-	} else if (inRobot.pose & Robot.TURN_CLOCKWISE) {
-		setTurnClockwisePoseTargets(inRobot);
-	} else if (inRobot.pose & Robot.TURN_COUNTERCLOCKWISE) {
-		setTurnCounterclockwisePoseTargets(inRobot);
-	} else if (inRobot.pose & Robot.FLOAT) {
-		setFloatPoseTargets(inRobot);
-	} else if (inRobot.pose & Robot.PUNCH) {
-		setPunchPoseTargets(inRobot);
-	}
-}
-
-function parseKeyboardCommands(inRobot, inEvent) {
-	console.log("PARSE");
-
-	newPose = 0;
-
-	// move forwards/backwards/left/right
-	if ( keyboard.pressed("W") ) {
-		newPose = newPose | Robot.PUSH_FORWARDS;
-	} 
-	if ( keyboard.pressed("S") ) {
-		newPose = newPose | Robot.PUSH_BACKWARDS;
-	} 
-	if ( keyboard.pressed("A") ) {
-		newPose = newPose | Robot.TURN_CLOCKWISE;
-	} 
-	if ( keyboard.pressed("D") ) {
-		newPose = newPose | Robot.TURN_COUNTERCLOCKWISE;
-	} 
-	if ( keyboard.pressed("2") ) {
-		newPose = newPose | Robot.PUNCH;
-	}  
-	if (newPose == 0) {
-		newPose = Robot.FLOAT;
-	}
-
-	if (inRobot.pose != newPose) {
-		console.log("CHANGE POSE TO " + newPose);
-		inRobot.pose = newPose;
-		pose(inRobot);	
-	}
-}
-
-// update the rotation and light intensity angles to match the targets
-function updatePose(inRobot) {
-	for (var pathString in inRobot.poseTargets.xrotation) {
-		objectPath = pathString.split(",");
-		var currentRotation = getRotationX(inRobot, objectPath);
-		var targetRotation = inRobot.poseTargets.xrotation[pathString];
-
-		setRotationX(inRobot, objectPath, (currentRotation + targetRotation) / 2.0);
-	}
-
-	for (var pathString in inRobot.poseTargets.yrotation) {
-		objectPath = pathString.split(",");
-		var currentRotation = getRotationY(inRobot, objectPath);
-		var targetRotation = inRobot.poseTargets.yrotation[pathString];
-
-		setRotationY(inRobot, objectPath, (currentRotation + targetRotation) / 2.0);
-	}
-
-	for (var pathString in inRobot.poseTargets.lightintensity) {
-		objectPath = pathString.split(",");
-		var currentIntensity = getLightIntensity(inRobot, objectPath);
-		var targetIntensity = inRobot.poseTargets.lightintensity[pathString];
-
-		setLightIntensity(inRobot, objectPath, (currentIntensity + targetIntensity) / 2.0);
-	}	
-}
-
-function updateVelocity(inRobot)
-{
-	var delta = clock.getDelta(); // seconds.
-	var moveDistance = delta * inRobot.velocity; // 200 pixels per second
-	var rotateAngle = Math.PI / 2 * inRobot.radialVelocity;   // pi/2 radians (90 degrees) per second
-	var rotation_matrix = new THREE.Matrix4().identity();
-
-	// center the skybox around the robot, so we don't run off the edge of it.
-	Robot.skybox.position = inRobot.position;
-
-	// always moving
-	inRobot.translateZ( moveDistance );
-
-	// always rotating
-	rotation_matrix = new THREE.Matrix4().makeRotationY(rotateAngle);
-	inRobot.matrix.multiply(rotation_matrix);
-	inRobot.rotation.setEulerFromRotationMatrix(inRobot.matrix);
-
-	// move forwards/backwards/left/right
-	if (inRobot.pose & Robot.PUSH_FORWARDS) {
-		inRobot.velocity = Math.max(-inRobot.maxVelocity, inRobot.velocity - inRobot.acceleration);
-		inRobot.radialVelocity = 0.9 * inRobot.radialVelocity;
-	} 
-	if (inRobot.pose & Robot.PUSH_BACKWARDS) {
-		inRobot.radialVelocity = 0.9 * inRobot.radialVelocity;
-		inRobot.velocity = Math.min(inRobot.maxVelocity, inRobot.velocity + inRobot.acceleration);
-	} 
-	
-	if (inRobot.pose & Robot.TURN_CLOCKWISE) {
-		inRobot.radialVelocity = Math.min(inRobot.maxRadialVelocity, inRobot.radialVelocity + inRobot.radialAcceleration);
-	} 
-	if (inRobot.pose & Robot.TURN_COUNTERCLOCKWISE) {
-		inRobot.radialVelocity = Math.max(-inRobot.maxRadialVelocity, inRobot.radialVelocity - inRobot.radialAcceleration);
-	} 
-
-	if (!(inRobot.pose & Robot.TURN_CLOCKWISE || inRobot.pose & Robot.TURN_COUNTERCLOCKWISE)) {
-		// Slow Down! unless pushing
-		inRobot.radialVelocity = 0.9 * inRobot.radialVelocity;
-	}
-
-	if (!(inRobot.pose & Robot.PUSH_BACKWARDS || inRobot.pose & Robot.PUSH_FORWARDS)) {
-		// Slow Down! unless pushing
-		inRobot.velocity = 0.95 * inRobot.velocity;
-	}
-
-	// set the engine sound based on both radial and forward velocity
-	Robot.engineGain.gain.value = Math.abs(inRobot.velocity / 1200) + Math.abs(inRobot.radialVelocity / 0.05);
-
-	document.getElementById('speedometer').innerHTML = Math.round(inRobot.velocity);
+	cameraChases(bob);
 }
 
 function cameraChases(inRobot) {
@@ -505,16 +195,16 @@ function cameraChases(inRobot) {
 	//TODO have target chase camera angle and distance for each pose! brilliant!
 	var relativeCameraOffset = new THREE.Vector3(10 + 1 * Math.sin(panClock), 300, 300 + 10 * Math.cos(panClock));
 
-	var cameraOffset = relativeCameraOffset.applyMatrix4( inRobot.matrixWorld );
+	var cameraOffset = relativeCameraOffset.applyMatrix4( inRobot.model.matrixWorld );
 
 	camera.position.x = cameraOffset.x;
 	camera.position.y = cameraOffset.y;
 	camera.position.z = cameraOffset.z;	
 
 	targetPosition = new THREE.Vector3();
-	targetPosition.x = inRobot.position.x;
-	targetPosition.y = inRobot.position.y + 170;
-	targetPosition.z = inRobot.position.z;
+	targetPosition.x = inRobot.model.position.x;
+	targetPosition.y = inRobot.model.position.y + 170;
+	targetPosition.z = inRobot.model.position.z;
 	camera.lookAt( targetPosition );
 	
 	camera.updateMatrix();
