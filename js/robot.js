@@ -466,7 +466,7 @@ Robot.prototype.createArm = function(inName) {
 Robot.prototype.hide = function(inPath) {
 	var toBeHidden = this.model;
 	for (var index = 0; index < inPath.length; index++) {
-		toBeHidden = toBeHidden.getChildByName(inPath[index]);
+		toBeHidden = toBeHidden.getObjectByName(inPath[index]);
 	}
 
 	toBeHidden.traverse(function (obj) {
@@ -477,7 +477,7 @@ Robot.prototype.hide = function(inPath) {
 Robot.prototype.show = function(inPath) {
 	var toBeHidden = this.model;
 	for (var index = 0; index < inPath.length; index++) {
-		toBeHidden = toBeHidden.getChildByName(inPath[index]);
+		toBeHidden = toBeHidden.getObjectByName(inPath[index]);
 	}
 
 	toBeHidden.traverse(function (obj) {
@@ -503,7 +503,7 @@ Robot.prototype.setLightIntensityTarget = function(inObjectPath, inAngle) {
 Robot.prototype.getRotationX = function(inPath) {
 	var toRotate = this.model;
 	for (var index = 0; index < inPath.length; index++) {
-		toRotate = toRotate.getChildByName(inPath[index]);
+		toRotate = toRotate.getObjectByName(inPath[index]);
 	}
 
 	return toRotate.rotation.x;
@@ -512,7 +512,7 @@ Robot.prototype.getRotationX = function(inPath) {
 Robot.prototype.setRotationX = function(inPath, inAngle) {
 	var toRotate = this.model;
 	for (var index = 0; index < inPath.length; index++) {
-		toRotate = toRotate.getChildByName(inPath[index]);
+		toRotate = toRotate.getObjectByName(inPath[index]);
 	}
 
 	toRotate.rotation.x = inAngle;
@@ -521,7 +521,7 @@ Robot.prototype.setRotationX = function(inPath, inAngle) {
 Robot.prototype.getRotationY = function(inPath) {
 	var toRotate = this.model;
 	for (var index = 0; index < inPath.length; index++) {
-		toRotate = toRotate.getChildByName(inPath[index]);
+		toRotate = toRotate.getObjectByName(inPath[index]);
 	}
 
 	return toRotate.rotation.y;
@@ -530,7 +530,7 @@ Robot.prototype.getRotationY = function(inPath) {
 Robot.prototype.setRotationY = function(inPath, inAngle) {
 	var toRotate = this.model;
 	for (var index = 0; index < inPath.length; index++) {
-		toRotate = toRotate.getChildByName(inPath[index]);
+		toRotate = toRotate.getObjectByName(inPath[index]);
 	}
 
 	toRotate.rotation.y = inAngle;
@@ -539,7 +539,7 @@ Robot.prototype.setRotationY = function(inPath, inAngle) {
 Robot.prototype.getLightIntensity = function(inPath) {
 	var toRotate = this.model;
 	for (var index = 0; index < inPath.length; index++) {
-		toRotate = toRotate.getChildByName(inPath[index]);
+		toRotate = toRotate.getObjectByName(inPath[index]);
 	}
 
 	return toRotate.intensity;
@@ -548,7 +548,7 @@ Robot.prototype.getLightIntensity = function(inPath) {
 Robot.prototype.setLightIntensity = function(inPath, inIntensity) {
 	var toBeHidden = this.model;
 	for (var index = 0; index < inPath.length; index++) {
-		toBeHidden = toBeHidden.getChildByName(inPath[index]);
+		toBeHidden = toBeHidden.getObjectByName(inPath[index]);
 	}
 
 	toBeHidden.traverse(function (obj) {
@@ -688,7 +688,7 @@ Robot.prototype.parseKeyboardCommands = function(inEvent) {
 		newPose = Robot.FLOAT;
 	}
 
-	if (this.pose != newPose) {
+	if (this.currentPose != newPose) {
 		console.log("CHANGE POSE TO " + newPose);
 		this.currentPose = newPose;
 		this.pose();	
@@ -767,7 +767,9 @@ Robot.prototype.updateVelocity = function()
 	// set the engine sound based on both radial and forward velocity
 	Robot.engineGain.gain.value = Math.abs(this.velocity / 1200) + Math.abs(this.radialVelocity / 0.05);
 
-	document.getElementById('speedometer').innerHTML = Math.round(this.velocity);
+	if (document.getElementById('speedometer')) {
+		document.getElementById('speedometer').innerHTML = Math.round(this.velocity);
+	}
 }
 
 Robot.prototype.cameraChases = function(inCamera) {
