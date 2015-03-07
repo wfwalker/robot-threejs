@@ -727,7 +727,6 @@ Robot.prototype.updateVelocity = function()
 	var delta = clock.getDelta(); // seconds.
 	var moveDistance = delta * this.velocity; // 200 pixels per second
 	var rotateAngle = Math.PI / 2 * this.radialVelocity;   // pi/2 radians (90 degrees) per second
-	var rotation_matrix = new THREE.Matrix4().identity();
 
 	// center the skybox around the robot, so we don't run off the edge of it.
 	Robot.skybox.position = this.model.position;
@@ -736,6 +735,7 @@ Robot.prototype.updateVelocity = function()
 	this.model.translateZ( moveDistance );
 
 	// always rotating
+	// TODO: create object each animation frame
 	rotation_matrix = new THREE.Matrix4().makeRotationY(rotateAngle);
 	this.model.matrix.multiply(rotation_matrix);
 	this.model.rotation.setEulerFromRotationMatrix(this.model.matrix);

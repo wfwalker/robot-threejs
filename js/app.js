@@ -11,6 +11,11 @@ var clock = new THREE.Clock();
 var bob = new Robot("bob");
 var angus = new Robot("angus");
 
+// Do not recreate these for every frame!
+var relativeCameraOffset = new THREE.Vector3();
+var targetPosition = new THREE.Vector3();
+
+
 // custom global variables
 
 init();
@@ -177,8 +182,8 @@ function animate()
     for (var index = 0; index < Robot.robots.length; index++) {
 		var aRobot = Robot.robots[index];
 
-	    if (aRobot.pose == Robot.FLOAT) {
-		    aRobot.position.y = 4*Math.sin(index * 1000 + Date.now()/700)+2;    	
+	    if (aRobot.currentPose == Robot.FLOAT) {
+		    aRobot.model.position.y = 4*Math.sin(index * 1000 + Date.now()/700)+2;    	
 	    }
     }
 
@@ -192,8 +197,12 @@ function animate()
 
 function cameraChases(inRobot) {
 	var panClock = Date.now() / 1400.0; 
+
 	//TODO have target chase camera angle and distance for each pose! brilliant!
-	var relativeCameraOffset = new THREE.Vector3(10 + 1 * Math.sin(panClock), 300, 300 + 10 * Math.cos(panClock));
+
+	relativeCameraOffset.x = 10 + 1 * Math.sin(panClock);
+	relativeCameraOffset.y = 300;
+	relativeCameraOffset.z = 300 + 10 * Math.cos(panClock);
 
 	var cameraOffset = relativeCameraOffset.applyMatrix4( inRobot.model.matrixWorld );
 
@@ -201,7 +210,6 @@ function cameraChases(inRobot) {
 	camera.position.y = cameraOffset.y;
 	camera.position.z = cameraOffset.z;	
 
-	targetPosition = new THREE.Vector3();
 	targetPosition.x = inRobot.model.position.x;
 	targetPosition.y = inRobot.model.position.y + 170;
 	targetPosition.z = inRobot.model.position.z;
