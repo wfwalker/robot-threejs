@@ -735,9 +735,6 @@ Robot.prototype.updateVelocity = function()
 	this.model.translateZ( moveDistance );	
 
 	// always rotating
-	// TODO: create object each animation frame
-	// rotation_matrix = new THREE.Matrix4().makeRotationY(rotateAngle);
-	// this.model.matrix.multiply(rotation_matrix);
 	this.model.rotateY(rotateAngle);
 
 	// move forwards/backwards/left/right
