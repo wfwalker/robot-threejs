@@ -28,7 +28,7 @@ function createPlatform(inName) {
 	var platform = new THREE.Object3D();
 
 	var floor = THREE.SceneUtils.createMultiMaterialObject( 
-		new THREE.CubeGeometry( 800, 800, 100, 1, 1, 1 ), 
+		new THREE.BoxGeometry( 800, 800, 100, 1, 1, 1 ), 
 		Robot.floorFrame );
 	floor.name = "platform";
 	floor.position.y = -50;
@@ -46,7 +46,7 @@ function createGloomyWorld(inScene) {
 	inScene.add(ambientLight);	
 
 	// SKYBOX/FOG
-	var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
+	var skyBoxGeometry = new THREE.BoxGeometry( 10000, 10000, 10000 );
 	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x555555, side: THREE.BackSide } );
 	Robot.skybox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
 	inScene.add(Robot.skybox);
@@ -78,7 +78,7 @@ function createSunlitWorld(inScene) {
 	   materialArray[i].side = THREE.BackSide;
 	var skyboxMaterial = new THREE.MeshFaceMaterial( materialArray );
 	
-	var skyboxGeom = new THREE.CubeGeometry( 10000, 10000, 10000, 1, 1, 1 );
+	var skyboxGeom = new THREE.BoxGeometry( 10000, 10000, 10000, 1, 1, 1 );
 	
 	Robot.skybox = new THREE.Mesh( skyboxGeom, skyboxMaterial );
 

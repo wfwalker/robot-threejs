@@ -98,9 +98,9 @@ Robot.flareFrame = [ flareMaterial, flareMaterial ];
 Robot.prototype.createLimbJoint = function(inName, diameter, thickness) {
 	var joint = new THREE.Object3D();
 
-	var modifier = new THREE.SubdivisionModifier( 1 );
+	// var modifier = new THREE.SubdivisionModifier( 1 );
 	var outerGeometry = new THREE.CylinderGeometry( diameter, diameter, thickness, 30, 4 );
-	modifier.modify(outerGeometry);
+	// modifier.modify(outerGeometry);
 	var outer = THREE.SceneUtils.createMultiMaterialObject( 
 		outerGeometry, 
 		Robot.goldFrame );
@@ -110,7 +110,7 @@ Robot.prototype.createLimbJoint = function(inName, diameter, thickness) {
 	joint.add(outer);
 
 	var innerGeometry = new THREE.CylinderGeometry( diameter/2, diameter/2, thickness+.5, 30, 4 );
-	modifier.modify(innerGeometry);
+	// modifier.modify(innerGeometry);
 	var inner = THREE.SceneUtils.createMultiMaterialObject( 
 		innerGeometry, 
 		Robot.redFrame );
@@ -217,9 +217,9 @@ Robot.prototype.createLight = function(inName) {
 Robot.prototype.createEye = function() {
 	var eye = new THREE.Object3D();
 
-	var modifier = new THREE.SubdivisionModifier( 1 );
+	// var modifier = new THREE.SubdivisionModifier( 1 );
 	var socketGeometry = new THREE.CylinderGeometry( 5, 5, 20, 20, 8 );
-	modifier.modify(socketGeometry);
+	// modifier.modify(socketGeometry);
 
 	var socket = THREE.SceneUtils.createMultiMaterialObject( 
 		socketGeometry, 
@@ -238,10 +238,10 @@ Robot.prototype.createEye = function() {
 Robot.prototype.createHead = function() {
 	var head = new THREE.Object3D();
 
-	var modifier = new THREE.SubdivisionModifier( 1 );
+	// var modifier = new THREE.SubdivisionModifier( 1 );
 
 	var skullGeometry = new THREE.CylinderGeometry( 18, 18, 30, 40, 6 );
-	modifier.modify(skullGeometry);
+	// modifier.modify(skullGeometry);
 
 	var skull = THREE.SceneUtils.createMultiMaterialObject( 
 		skullGeometry, 
@@ -286,9 +286,9 @@ Robot.prototype.createBody = function() {
 	righttank.position.set(-15, 80, 25);
 	body.add(righttank);
 
-	var bodyGeometry = new THREE.CubeGeometry( 70, 80, 30, 4, 4, 4 );
-	var modifier = new THREE.SubdivisionModifier( 1 );
-	modifier.modify( bodyGeometry ); 
+	var bodyGeometry = new THREE.BoxGeometry( 70, 80, 30, 4, 4, 4 );
+	// var modifier = new THREE.SubdivisionModifier( 1 );
+	// modifier.modify( bodyGeometry ); 
 
 	var bodyBox = THREE.SceneUtils.createMultiMaterialObject( 
 		bodyGeometry, 
@@ -296,16 +296,16 @@ Robot.prototype.createBody = function() {
 	bodyBox.position.y = 80;
 	body.add(bodyBox);
 
-	var hipsGeometry = new THREE.CubeGeometry( 50, 35, 30, 4, 4, 4 );
-	modifier.modify(hipsGeometry);
+	var hipsGeometry = new THREE.BoxGeometry( 50, 35, 30, 4, 4, 4 );
+	// modifier.modify(hipsGeometry);
 	var hips = THREE.SceneUtils.createMultiMaterialObject( 
 		hipsGeometry, 
 		Robot.steelFrame );
 	hips.position.y = 20;
 	body.add(hips);
 
-	var beltGeometry = new THREE.CubeGeometry( 43, 30, 23, 4, 4, 4 );
-	modifier.modify(beltGeometry);
+	var beltGeometry = new THREE.BoxGeometry( 43, 30, 23, 4, 4, 4 );
+	// modifier.modify(beltGeometry);
 
 	var belt = THREE.SceneUtils.createMultiMaterialObject( 
 		beltGeometry, 
@@ -322,7 +322,7 @@ Robot.prototype.createFoot = function(inName) {
 	var foot = new THREE.Object3D();
 
 	var heel = THREE.SceneUtils.createMultiMaterialObject( 
-		new THREE.CubeGeometry( 16, 10, 16, 1, 1, 1 ), 
+		new THREE.BoxGeometry( 16, 10, 16, 1, 1, 1 ), 
 		Robot.steelFrame );
 	heel.position.set(0, 5, 0);
 	heel.name = "heel";
@@ -342,7 +342,7 @@ Robot.prototype.createFoot = function(inName) {
 	}
 
 	var toebox = THREE.SceneUtils.createMultiMaterialObject( 
-		new THREE.CubeGeometry( 16, 10, 10, 1, 1, 1 ), 
+		new THREE.BoxGeometry( 16, 10, 10, 1, 1, 1 ), 
 		Robot.steelFrame );
 	toebox.position.set(0, 5, -22);
 	toebox.name = "toebox";
@@ -375,9 +375,9 @@ Robot.prototype.createFlare = function(inName) {
 Robot.prototype.createShinJet = function(inName) {
 	var shinjet = new THREE.Object3D();
 
-	var modifier = new THREE.SubdivisionModifier( 1 );
+	// var modifier = new THREE.SubdivisionModifier( 1 );
 	var tubeGeometry = new THREE.CylinderGeometry( 15, 15, 60, 30, 10 );
-	modifier.modify( tubeGeometry ); 	
+	// modifier.modify( tubeGeometry ); 	
 
 	var tube = THREE.SceneUtils.createMultiMaterialObject( 
 		tubeGeometry, 
@@ -732,13 +732,13 @@ Robot.prototype.updateVelocity = function()
 	Robot.skybox.position = this.model.position;
 
 	// always moving
-	this.model.translateZ( moveDistance );
+	this.model.translateZ( moveDistance );	
 
 	// always rotating
 	// TODO: create object each animation frame
-	rotation_matrix = new THREE.Matrix4().makeRotationY(rotateAngle);
-	this.model.matrix.multiply(rotation_matrix);
-	this.model.rotation.setEulerFromRotationMatrix(this.model.matrix);
+	// rotation_matrix = new THREE.Matrix4().makeRotationY(rotateAngle);
+	// this.model.matrix.multiply(rotation_matrix);
+	this.model.rotateY(rotateAngle);
 
 	// move forwards/backwards/left/right
 	if (this.currentPose & Robot.PUSH_FORWARDS) {
