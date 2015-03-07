@@ -729,11 +729,15 @@ Robot.prototype.updateVelocity = function()
 	// center the skybox around the robot, so we don't run off the edge of it.
 	Robot.skybox.position = this.model.position;
 
-	// always moving
-	this.model.translateZ( moveDistance );	
+	// translate as needed
+	if (Math.abs(moveDistance) > 0.5) {
+		this.model.translateZ( moveDistance );	
+	}
 
-	// always rotating
-	this.model.rotateY(rotateAngle);
+	// rotate as needed
+	if (Math.abs(rotateAngle) > 0.0001) {
+		this.model.rotateY(rotateAngle);
+	}
 
 	// move forwards/backwards/left/right
 	if (this.currentPose & Robot.PUSH_FORWARDS) {

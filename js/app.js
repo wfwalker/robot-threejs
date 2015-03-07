@@ -175,19 +175,13 @@ function animate()
 		var aRobot = Robot.robots[index];
 
 	    if (aRobot.currentPose == Robot.FLOAT) {
-		    aRobot.model.position.y = 4*Math.sin(index * 1000 + clock.elapsedTime/700)+2;    	
+		    aRobot.model.position.y = 4*Math.sin(index * 1000 + clock.elapsedTime)+2;    	
 	    }
     }
 
-	render();		
+	renderer.render( scene, camera );
 
 	bob.updateVelocity();
 	bob.updatePose();
-
 	bob.cameraChases(camera);
-}
-
-function render() 
-{
-	renderer.render( scene, camera );
 }
