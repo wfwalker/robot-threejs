@@ -17,55 +17,6 @@ animate();
 
 // consider using http://evanw.github.com/csg.js/docs/
 
-function createLight(inName) {
-	var light = new THREE.Object3D();
-
-	var lightSphere = THREE.SceneUtils.createMultiMaterialObject( 
-	new THREE.SphereGeometry( 3, 32, 16 ), Robot.lightFrame );
-	lightSphere.position.set(0, 0, 0);
-	light.add(lightSphere);
-
-	var lightTarget = new THREE.Object3D();
-	lightTarget.position.set(0, 0, -100);
-
-	var lightSource = new THREE.SpotLight( 0xffffff );
-	lightSource.position.set(0, 0, 0);
-	lightSource.castShadow = true;
-	lightSource.shadowMapWidth = 1024;
-	lightSource.shadowMapHeight = 1024;
-	lightSource.shadowCameraNear = 500;
-	lightSource.shadowCameraFar = 4000;
-	lightSource.shadowCameraFov = 30;
-
-	lightSource.target = lightTarget;
-
-	light.add(lightTarget);
-	light.add(lightSource);	
-
-	light.name = inName;
-
-	return light;
-}
-
-function createFlare(inName) {
-	var light = new THREE.Object3D();
-
-	var lightCylinder = THREE.SceneUtils.createMultiMaterialObject( 
-	new THREE.CylinderGeometry( 10, 10, 3, 30, 4 ), Robot.flareFrame );
-	lightCylinder.position.set(0, 6, 0);
-	light.add(lightCylinder);
-
-	var lightSource = new THREE.PointLight(0xff9999);
-	lightSource.position.set(0, 0, 0);
-	lightSource.name = 'source';
-	light.add(lightSource);
-
-	light.name = inName;
-
-	return light;
-}
-
-
 function createPlatform(inName) {
 	var platform = new THREE.Object3D();
 
@@ -543,6 +494,7 @@ function updateVelocity(inRobot)
 		inRobot.velocity = 0.95 * inRobot.velocity;
 	}
 
+	// set the engine sound based on both radial and forward velocity
 	Robot.engineGain.gain.value = Math.abs(inRobot.velocity / 1200) + Math.abs(inRobot.radialVelocity / 0.05);
 
 	document.getElementById('speedometer').innerHTML = Math.round(inRobot.velocity);
