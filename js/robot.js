@@ -723,10 +723,12 @@ Robot.prototype.updateVelocity = function()
 	if (this.currentPose & Robot.PUSH_FORWARDS) {
 		this.velocity = Math.max(-this.maxVelocity, this.velocity - this.acceleration);
 		this.radialVelocity = 0.9 * this.radialVelocity;
+		Robot.pushGain.gain.value = 1;
 	} 
 	if (this.currentPose & Robot.PUSH_BACKWARDS) {
 		this.radialVelocity = 0.9 * this.radialVelocity;
 		this.velocity = Math.min(this.maxVelocity, this.velocity + this.acceleration);
+		Robot.pushGain.gain.value = 1;
 	} 
 	
 	if (this.currentPose & Robot.TURN_CLOCKWISE) {
@@ -744,10 +746,11 @@ Robot.prototype.updateVelocity = function()
 	if (!(this.currentPose & Robot.PUSH_BACKWARDS || this.currentPose & Robot.PUSH_FORWARDS)) {
 		// Slow Down! unless pushing
 		this.velocity = 0.95 * this.velocity;
+		Robot.pushGain.gain.value = 0;
 	}
 
 	// set the engine sound based on both radial and forward velocity
-	Robot.engineGain.gain.value = Math.abs(this.velocity / 1200) + Math.abs(this.radialVelocity / 0.05);
+	Robot.speedGain.gain.value = Math.abs(this.velocity / 1200) + Math.abs(this.radialVelocity / 0.05);
 
 	if (document.getElementById('speedometer')) {
 		document.getElementById('speedometer').innerHTML = Math.round(this.velocity);

@@ -148,27 +148,52 @@ function initAudio() {
 	window.AudioContext = window.AudioContext||window.webkitAudioContext;
 	context = new AudioContext();
 	console.log("created audio context");
-	console.log(context);
 
 	var bufferSize = 2 * context.sampleRate;
-	noiseBuffer = context.createBuffer(1, bufferSize, context.sampleRate);
-	output = noiseBuffer.getChannelData(0);
+
+	// SPEED sound proportional to velocity
+
+	speedBuffer = context.createBuffer(1, bufferSize, context.sampleRate);
+	output = speedBuffer.getChannelData(0);
 	for (var i = 0; i < bufferSize; i++) {
 		output[i] = Math.random() * 2 - 1;
 	}
 
-	var whiteNoise = context.createBufferSource();
-	whiteNoise.buffer = noiseBuffer;
-	whiteNoise.loop = true;
+	var speedSource = context.createBufferSource();
+	speedSource.buffer = speedBuffer;
+	speedSource.loop = true;
 
 	// create gain, wire up to noise
-	Robot.engineGain = context.createGain();
-	whiteNoise.connect(Robot.engineGain);
-	Robot.engineGain.connect(context.destination);
+	Robot.speedGain = context.createGain();
+	speedSource.connect(Robot.speedGain);
+	Robot.speedGain.connect(context.destination);
 
 	// initialize gain.gain, start whitenoise
-	Robot.engineGain.gain.value = 0;
-	whiteNoise.start(0);
+	Robot.speedGain.gain.value = 0;
+	speedSource.start(0);
+
+
+	// PUSH sound when pushing
+
+	pushBuffer = context.createBuffer(1, bufferSize, context.sampleRate);
+	output = pushBuffer.getChannelData(0);
+	for (var i = 0; i < bufferSize; i++) {
+		output[i] = (i % 1000) / 1000.0;
+	}
+
+	var pushSource = context.createBufferSource();
+	pushSource.buffer = pushBuffer;
+	pushSource.loop = true;
+
+	// create gain, wire up to noise
+	Robot.pushGain = context.createGain();
+	pushSource.connect(Robot.pushGain);
+	Robot.pushGain.connect(context.destination);
+
+	// initialize gain.gain, start whitenoise
+	Robot.pushGain.gain.value = 0;
+	pushSource.start(0);
+
 }
 
 function animate() 
