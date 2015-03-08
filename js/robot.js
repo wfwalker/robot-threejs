@@ -67,30 +67,24 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'images/metal1.jpg' );
 floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 
 var floorMaterial = new THREE.MeshPhongMaterial( { map: floorTexture, color: 0xBBBBBB, specular: 0xffffff } );
-var wireframeMaterial1 = new THREE.MeshBasicMaterial( { color: 0x888888, wireframe: true, transparent: true } ); 
 Robot.floorFrame = [ floorMaterial, floorMaterial ]; 
 
 var steelTexture = new THREE.ImageUtils.loadTexture( 'images/moon.jpg' );
 steelTexture.wrapS = steelTexture.wrapT = THREE.RepeatWrapping; 
 
 var redMaterial = new THREE.MeshPhongMaterial( { map: steelTexture, color: 0xff0000, specular: 0xff0000 } );
-var wireframeMaterial1 = new THREE.MeshBasicMaterial( { color: 0x888888, wireframe: true, transparent: true } ); 
 Robot.redFrame = [ redMaterial, redMaterial ]; 
 
 var steelMaterial = new THREE.MeshPhongMaterial( { map: steelTexture, color: 0xBBBBBB, specular: 0xffffff } );
-var wireframeMaterial1 = new THREE.MeshBasicMaterial( { color: 0x888888, wireframe: true, transparent: true } ); 
 Robot.steelFrame = [ steelMaterial, steelMaterial ]; 
 
 var goldMaterial = new THREE.MeshPhongMaterial( { map: steelTexture, color: 0xF5E642, specular: 0xff0000 } );
-var wireframeMaterial2 = new THREE.MeshBasicMaterial( { color: 0x888888, wireframe: true, transparent: true } ); 
 Robot.goldFrame = [ goldMaterial, goldMaterial ]; 
 
 var lightMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, specular: 0xffffff, ambient: 0xffffff } );
-var wireframeMaterial2 = new THREE.MeshBasicMaterial( { color: 0x888888, wireframe: true, transparent: true } ); 
 Robot.lightFrame = [ lightMaterial, lightMaterial ]; 
 
 var flareMaterial = new THREE.MeshBasicMaterial( { color: 0xff9999, specular: 0xffffff, ambient: 0xffffff } );
-var wireframeMaterial2 = new THREE.MeshBasicMaterial( { color: 0xff9999, wireframe: true, transparent: true } ); 
 Robot.flareFrame = [ flareMaterial, flareMaterial ]; 
 
 // INSTANCE METHODS
@@ -192,7 +186,7 @@ Robot.prototype.createLight = function(inName) {
 	var lightTarget = new THREE.Object3D();
 	lightTarget.position.set(0, 0, -100);
 
-	var lightSource = new THREE.SpotLight( 0xffffff );
+	var lightSource = new THREE.SpotLight(0xffffff, 0.7, 1000);
 	lightSource.position.set(0, 0, 0);
 	lightSource.castShadow = true;
 	lightSource.shadowMapWidth = 1024;
@@ -350,7 +344,7 @@ Robot.prototype.createFlare = function(inName) {
 	lightCylinder.position.set(0, 6, 0);
 	light.add(lightCylinder);
 
-	var lightSource = new THREE.PointLight(0xff9999);
+	var lightSource = new THREE.PointLight(0xff9999, 5, 10);
 	lightSource.position.set(0, 0, 0);
 	lightSource.name = 'source';
 	light.add(lightSource);

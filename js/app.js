@@ -44,6 +44,10 @@ function createGloomyWorld(inScene) {
 	var ambientLight = new THREE.AmbientLight(0x111111);
 	inScene.add(ambientLight);	
 
+	var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+	directionalLight.position.set( 0, 1, 0 );
+	inScene.add( directionalLight );
+
 	// SKYBOX/FOG
 	var skyBoxGeometry = new THREE.BoxGeometry( 10000, 10000, 10000 );
 	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x555555, side: THREE.BackSide } );
