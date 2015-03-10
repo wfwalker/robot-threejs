@@ -67,8 +67,12 @@ function createGloomyWorld(inScene) {
 }
 
 function createSunlitWorld(inScene) {
-	var ambientLight = new THREE.AmbientLight(0x111111);
+	var ambientLight = new THREE.AmbientLight(0x303030);
 	inScene.add(ambientLight);	
+
+	var directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+	directionalLight.position.set( 10, 10, 0 );
+	inScene.add( directionalLight );
 
 	var materialArray = [];
 	materialArray.push(new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/dawnmountain-xpos.png' ) }));
@@ -125,8 +129,8 @@ function init()
 	THREEx.WindowResize(renderer, camera);
 	THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
 
-	createGloomyWorld(scene);
-	// createSunlitWorld(scene);
+	// createGloomyWorld(scene);
+	createSunlitWorld(scene);
 
 	scene.add(bob.model);
 
