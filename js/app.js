@@ -44,8 +44,8 @@ function createGloomyWorld(inScene) {
 	var ambientLight = new THREE.AmbientLight(0x111111);
 	inScene.add(ambientLight);	
 
-	var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-	directionalLight.position.set( 0, 1, 0 );
+	var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
+	directionalLight.position.set( 10, 10, 0 );
 	inScene.add( directionalLight );
 
 	// SKYBOX/FOG
@@ -129,8 +129,8 @@ function init()
 	THREEx.WindowResize(renderer, camera);
 	THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
 
-	// createGloomyWorld(scene);
-	createSunlitWorld(scene);
+	createGloomyWorld(scene);
+	// createSunlitWorld(scene);
 
 	scene.add(bob.model);
 

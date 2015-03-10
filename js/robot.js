@@ -66,16 +66,16 @@ Robot.robots = [];
 var floorTexture = new THREE.ImageUtils.loadTexture( 'images/metal1.jpg' );
 floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 
-var floorMaterial = new THREE.MeshPhongMaterial( { map: floorTexture, bumpMap: floorTexture, bumpScale: 0.5, color: 0x222222, specular: 0xffffff } );
+var floorMaterial = new THREE.MeshPhongMaterial( { map: floorTexture, bumpMap: floorTexture, bumpScale: 0.5, color: 0x222222, specular: 0x444444 } );
 Robot.floorFrame = [ floorMaterial, floorMaterial ]; 
 
 var steelTexture = new THREE.ImageUtils.loadTexture( 'images/moon.jpg' );
 steelTexture.wrapS = steelTexture.wrapT = THREE.RepeatWrapping; 
 
-var redMaterial = new THREE.MeshPhongMaterial( { map: steelTexture, bumpMap: steelTexture, bumpScale: 0.3, color: 0xff0000, specular: 0xff0000 } );
+var redMaterial = new THREE.MeshPhongMaterial( { map: steelTexture, bumpMap: steelTexture, bumpScale: 0.3, color: 0xff0000, specular: 0xCC0000 } );
 Robot.redFrame = [ redMaterial, redMaterial ]; 
 
-var steelMaterial = new THREE.MeshPhongMaterial( { map: steelTexture, bumpMap: steelTexture, bumpScale: 0.3, color: 0xBBBBBB, specular: 0x999999 } );
+var steelMaterial = new THREE.MeshPhongMaterial( { map: steelTexture, bumpMap: steelTexture, bumpScale: 0.3, color: 0xBBBBBB, specular: 0x777777 } );
 Robot.steelFrame = [ steelMaterial, steelMaterial ]; 
 
 var goldMaterial = new THREE.MeshPhongMaterial( { map: steelTexture, bumpMap: steelTexture, bumpScale: 0.3, color: 0xF5E642, specular: 0xff0000 } );
@@ -280,7 +280,7 @@ Robot.prototype.createBody = function() {
 	bodyBox.position.y = 80;
 	body.add(bodyBox);
 
-	var hipsGeometry = new THREE.BoxGeometry( 50, 35, 30, 4, 4, 4 );
+	var hipsGeometry = new THREE.BoxGeometry( 50, 30, 30, 4, 4, 4 );
 	var hips = THREE.SceneUtils.createMultiMaterialObject( 
 		hipsGeometry, 
 		Robot.steelFrame );
