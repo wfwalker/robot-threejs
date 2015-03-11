@@ -802,7 +802,7 @@ Robot.prototype.microphoneChases = function(inCamera) {
 	vec.normalize();
 
 	// Multiply the up vector by the world matrix.
-	var up = new THREE.Vector3(0,-1,0);
+	var up = new THREE.Vector3(0,1,0);
 	up.applyProjection(m);
 	up.normalize();
 
