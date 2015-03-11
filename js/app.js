@@ -11,6 +11,8 @@ var clock = new THREE.Clock();
 var bob = new Robot("bob");
 var angus = new Robot("angus");
 
+var listener = null;
+
 // Do not recreate these for every frame!
 var relativeCameraOffset = new THREE.Vector3();
 var targetPosition = new THREE.Vector3();
@@ -151,6 +153,7 @@ function initAudio() {
 	// wire up sound
 	window.AudioContext = window.AudioContext||window.webkitAudioContext;
 	context = new AudioContext();
+	listener = context.listener;
 	console.log("created audio context");
 
 	var bufferSize = 2 * context.sampleRate;
@@ -198,6 +201,37 @@ function initAudio() {
 	Robot.pushGain.gain.value = 0;
 	pushSource.start(0);
 
+	// BEACON
+
+	beaconBuffer = context.createBuffer(1, bufferSize, context.sampleRate);
+	output = beaconBuffer.getChannelData(0);
+	for (var i = 0; i < bufferSize; i++) {
+		output[i] = Math.random() * 0.5 - 0.25;
+	}
+
+	var beaconSource = context.createBufferSource();
+	beaconSource.buffer = beaconBuffer;
+	beaconSource.loop = true;
+
+	// create panner in fixed position
+	var panner = context.createPanner();
+	panner.panningModel = 'HRTF';
+	panner.distanceModel = 'inverse';
+	panner.refDistance = 100;
+	panner.maxDistance = 10000;
+	panner.rolloffFactor = 1;
+	panner.coneInnerAngle = 360;
+	panner.coneOuterAngle = 0;
+	panner.coneOuterGain = 0;
+	panner.setOrientation(1,0,0);
+	panner.setPosition(300,0,0);
+	beaconSource.connect(panner);
+
+	// create gain, wire up to noise
+	panner.connect(context.destination);
+
+	// initialize gain.gain, start whitenoise
+	beaconSource.start(0);
 }
 
 function animate() 
@@ -217,4 +251,5 @@ function animate()
 	bob.updateVelocity();
 	bob.updatePose();
 	bob.cameraChases(camera);
+	bob.microphoneChases(camera);
 }

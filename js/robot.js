@@ -755,6 +755,12 @@ Robot.prototype.updateVelocity = function()
 	if (document.getElementById('speedometer')) {
 		document.getElementById('speedometer').innerHTML = Math.round(this.velocity);
 	}
+
+	if (listener) {
+		listener.setPosition(this.model.position.x, this.model.position.y, this.model.position.z);
+	} else {
+		console.log('no listener');
+	}
 }
 
 Robot.prototype.cameraChases = function(inCamera) {
@@ -781,3 +787,29 @@ Robot.prototype.cameraChases = function(inCamera) {
 	inCamera.updateProjectionMatrix();
 }
 
+Robot.prototype.microphoneChases = function(inCamera) {
+	// UPDATE AUDIO LISTENER TO CAMERA
+
+	// The camera's world matrix is named "matrix".
+	var m = inCamera.matrix;
+
+	var mx = m.elements[12], my = m.elements[13], mz = m.elements[14];
+	m.elements[12] = m.elements[13] = m.elements[14] = 0;
+
+	// Multiply the orientation vector by the world matrix of the camera.
+	var vec = new THREE.Vector3(0,0,-1);
+	vec.applyProjection(m);
+	vec.normalize();
+
+	// Multiply the up vector by the world matrix.
+	var up = new THREE.Vector3(0,-1,0);
+	up.applyProjection(m);
+	up.normalize();
+
+	// Set the orientation and the up-vector for the listener.
+	listener.setOrientation(vec.x, vec.y, vec.z, up.x, up.y, up.z);
+
+	m.elements[12] = mx;
+	m.elements[13] = my;
+	m.elements[14] = mz;		
+}
