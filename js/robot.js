@@ -78,7 +78,7 @@ Robot.redFrame = [ redMaterial, redMaterial ];
 var steelMaterial = new THREE.MeshPhongMaterial( { map: steelTexture, bumpMap: steelTexture, bumpScale: 0.3, color: 0xBBBBBB, specular: 0x777777 } );
 Robot.steelFrame = [ steelMaterial, steelMaterial ]; 
 
-var goldMaterial = new THREE.MeshPhongMaterial( { map: steelTexture, bumpMap: steelTexture, bumpScale: 0.3, color: 0xF5E642, specular: 0xff0000 } );
+var goldMaterial = new THREE.MeshPhongMaterial( { map: steelTexture, bumpMap: steelTexture, bumpScale: 0.3, color: 0xF5E642, specular: 0xF5E642 } );
 Robot.goldFrame = [ goldMaterial, goldMaterial ]; 
 
 var lightMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, specular: 0xffffff, ambient: 0xffffff } );
