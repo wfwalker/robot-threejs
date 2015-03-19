@@ -467,6 +467,7 @@ Robot.prototype.show = function(inPath) {
 
 // set the target x rotation of the object at the specified object path to the given angle
 Robot.prototype.setRotationXTarget = function(inObjectPath, inAngle) {
+	// TODO: can't use an array as an dictionary key, gets converted to string
 	this.poseTargets.xrotation[inObjectPath] = inAngle;
 }
 
@@ -676,6 +677,7 @@ Robot.prototype.parseKeyboardCommands = function(inEvent) {
 // update the rotation and light intensity angles to match the targets
 Robot.prototype.updatePose = function() {
 	for (var pathString in this.poseTargets.xrotation) {
+		// TODO: jillions of allocations here, no need to do this split() more than once!
 		objectPath = pathString.split(",");
 		var currentRotation = this.getRotationX(objectPath);
 		var targetRotation = this.poseTargets.xrotation[pathString];
