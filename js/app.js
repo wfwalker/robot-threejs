@@ -43,7 +43,7 @@ function createPlatform(inName) {
 }
 
 function createGloomyWorld(inScene) {
-	var ambientLight = new THREE.AmbientLight(0x111111);
+	var ambientLight = new THREE.AmbientLight(0x222222);
 	inScene.add(ambientLight);	
 
 	var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
@@ -55,7 +55,7 @@ function createGloomyWorld(inScene) {
 	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x555555, side: THREE.BackSide } );
 	Robot.skybox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
 	inScene.add(Robot.skybox);
-	inScene.fog = new THREE.FogExp2( 0x555555, 0.0005 );
+	inScene.fog = new THREE.FogExp2( 0x555555, 0.0003 );
 
 	// floating platforms	
 	var start = createPlatform('start');
