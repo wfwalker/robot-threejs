@@ -10,6 +10,7 @@ var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 var bob = new Robot("bob");
 var angus = new Robot("angus");
+var beacon = null;
 
 var listener = null;
 
@@ -26,7 +27,7 @@ animate();
 // consider using http://evanw.github.com/csg.js/docs/
 
 function createBeacon(inName) {
-	var beaconGeometry = new THREE.BoxGeometry( 400, 400, 400, 1, 1, 1 );
+	var beaconGeometry = new THREE.BoxGeometry( 200, 200, 200, 1, 1, 1 );
 	var cube = new THREE.Mesh( beaconGeometry, Robot.goldMaterial );
 	cube.name = inName;
 	return cube;
@@ -70,7 +71,7 @@ function createGloomyWorld(inScene) {
 
 	// beacon
 
-	var beacon = createBeacon('beacon1');
+	beacon = createBeacon('beacon1');
 	beacon.position.set(2000, 100, 0);
 	console.log(beacon);
 	inScene.add(beacon);
@@ -275,6 +276,10 @@ function animate()
 		    aRobot.model.position.y = 4*Math.sin(index * 1000 + clock.elapsedTime)+2;    	
 	    }
     }
+
+	beacon.rotation.x = clock.elapsedTime / 5.0;
+	beacon.rotation.y = clock.elapsedTime / 7.0;
+	beacon.rotation.z = clock.elapsedTime / 9.0;
 
 	renderer.render( scene, camera );
 
