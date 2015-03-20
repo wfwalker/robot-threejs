@@ -735,14 +735,17 @@ Robot.prototype.updateVelocity = function()
 	
 	if (this.currentPose & Robot.TURN_CLOCKWISE) {
 		this.radialVelocity = Math.min(this.maxRadialVelocity, this.radialVelocity + this.radialAcceleration);
+		Robot.turnGain.gain.value = 1;
 	} 
 	if (this.currentPose & Robot.TURN_COUNTERCLOCKWISE) {
 		this.radialVelocity = Math.max(-this.maxRadialVelocity, this.radialVelocity - this.radialAcceleration);
+		Robot.turnGain.gain.value = 1;
 	} 
 
 	if (!(this.currentPose & Robot.TURN_CLOCKWISE || this.currentPose & Robot.TURN_COUNTERCLOCKWISE)) {
 		// Slow Down! unless pushing
 		this.radialVelocity = 0.9 * this.radialVelocity;
+		Robot.turnGain.gain.value = 0;
 	}
 
 	if (!(this.currentPose & Robot.PUSH_BACKWARDS || this.currentPose & Robot.PUSH_FORWARDS)) {

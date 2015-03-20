@@ -201,6 +201,27 @@ function initAudio() {
 	Robot.pushGain.gain.value = 0;
 	pushSource.start(0);
 
+	// TURN sound when pushing
+
+	turnBuffer = context.createBuffer(1, bufferSize, context.sampleRate);
+	output = turnBuffer.getChannelData(0);
+	for (var i = 0; i < bufferSize; i++) {
+		output[i] = (i % 900) / 1000.0;
+	}
+
+	var turnSource = context.createBufferSource();
+	turnSource.buffer = turnBuffer;
+	turnSource.loop = true;
+
+	// create gain, wire up to noise
+	Robot.turnGain = context.createGain();
+	turnSource.connect(Robot.turnGain);
+	Robot.turnGain.connect(context.destination);
+
+	// initialize gain.gain, start whitenoise
+	Robot.turnGain.gain.value = 0;
+	turnSource.start(0);
+
 	// BEACON
 
 	beaconBuffer = context.createBuffer(1, bufferSize, context.sampleRate);
