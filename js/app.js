@@ -26,35 +26,18 @@ animate();
 // consider using http://evanw.github.com/csg.js/docs/
 
 function createBeacon(inName) {
-	var platform = new THREE.Object3D();
-
-	var floor = THREE.SceneUtils.createMultiMaterialObject( 
-		new THREE.BoxGeometry( 400, 400, 400, 1, 1, 1 ), 
-		Robot.goldFrame );
-	floor.name = "beacon";
-	floor.position.y = 100;
-	floor.rotation.x = Math.PI / 2;
-
-	platform.add(floor);
-
-	platform.name = inName;
-
-	return platform;
+	var beaconGeometry = new THREE.BoxGeometry( 400, 400, 400, 1, 1, 1 );
+	var cube = new THREE.Mesh( beaconGeometry, Robot.goldMaterial );
+	cube.name = inName;
+	return cube;
 }
 
 function createPlatform(inName) {
-	var platform = new THREE.Object3D();
-
-	var floor = THREE.SceneUtils.createMultiMaterialObject( 
-		new THREE.BoxGeometry( 800, 800, 100, 1, 1, 1 ), 
-		Robot.floorFrame );
-	floor.name = "platform";
-	floor.position.y = -50;
-	floor.rotation.x = Math.PI / 2;
-
-	platform.add(floor);
+	var platformGeometry = new THREE.BoxGeometry( 800, 800, 100, 1, 1, 1 );
+	var platform = new THREE.Mesh( platformGeometry, Robot.floorMaterial );
 
 	platform.name = inName;
+	platform.rotation.x = Math.PI / 2;
 
 	return platform;
 }
@@ -76,6 +59,7 @@ function createGloomyWorld(inScene) {
 
 	// floating platforms	
 	var start = createPlatform('start');
+	start.position.y = -50;
 	inScene.add(start);
 
 	for (var index = 0; index < 50; index++) {
@@ -87,7 +71,7 @@ function createGloomyWorld(inScene) {
 	// beacon
 
 	var beacon = createBeacon('beacon1');
-	beacon.position.set(2000, 0, 0);
+	beacon.position.set(2000, 100, 0);
 	console.log(beacon);
 	inScene.add(beacon);
 

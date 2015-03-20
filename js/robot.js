@@ -63,29 +63,23 @@ Robot.robots = [];
 // GLOBAL TEXTURES
 
 // Materials and Textures
-var floorTexture = new THREE.ImageUtils.loadTexture( 'images/metal1.jpg' );
-floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
+Robot.floorTexture = new THREE.ImageUtils.loadTexture( 'images/metal1.jpg' );
+Robot.floorTexture.wrapS = Robot.floorTexture.wrapT = THREE.RepeatWrapping; 
 
-var floorMaterial = new THREE.MeshPhongMaterial( { map: floorTexture, bumpMap: floorTexture, bumpScale: 0.5, color: 0x222222, specular: 0x444444 } );
-Robot.floorFrame = [ floorMaterial, floorMaterial ]; 
+Robot.floorMaterial = new THREE.MeshPhongMaterial( { map: Robot.floorTexture, bumpMap: Robot.floorTexture, bumpScale: 0.5, color: 0x222222, specular: 0x444444 } );
 
-var steelTexture = new THREE.ImageUtils.loadTexture( 'images/moon.jpg' );
-steelTexture.wrapS = steelTexture.wrapT = THREE.RepeatWrapping; 
+Robot.steelTexture = new THREE.ImageUtils.loadTexture( 'images/moon.jpg' );
+Robot.steelTexture.wrapS = Robot.steelTexture.wrapT = THREE.RepeatWrapping; 
 
-var redMaterial = new THREE.MeshPhongMaterial( { map: steelTexture, bumpMap: steelTexture, bumpScale: 0.3, color: 0xff0000, specular: 0xCC0000 } );
-Robot.redFrame = [ redMaterial, redMaterial ]; 
+Robot.redMaterial = new THREE.MeshPhongMaterial( { map: Robot.steelTexture, bumpMap: Robot.steelTexture, bumpScale: 0.3, color: 0xff0000, specular: 0xCC0000 } );
 
-var steelMaterial = new THREE.MeshPhongMaterial( { map: steelTexture, bumpMap: steelTexture, bumpScale: 0.3, color: 0xBBBBBB, specular: 0x777777 } );
-Robot.steelFrame = [ steelMaterial, steelMaterial ]; 
+Robot.steelMaterial = new THREE.MeshPhongMaterial( { map: Robot.steelTexture, bumpMap: Robot.steelTexture, bumpScale: 0.3, color: 0xBBBBBB, specular: 0x777777 } );
 
-var goldMaterial = new THREE.MeshPhongMaterial( { map: steelTexture, bumpMap: steelTexture, bumpScale: 0.3, color: 0xF5E642, specular: 0xF5E642 } );
-Robot.goldFrame = [ goldMaterial, goldMaterial ]; 
+Robot.goldMaterial = new THREE.MeshPhongMaterial( { map: Robot.steelTexture, bumpMap: Robot.steelTexture, bumpScale: 0.3, color: 0xF5E642, specular: 0xF5E642 } );
 
-var lightMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, specular: 0xffffff, ambient: 0xffffff } );
-Robot.lightFrame = [ lightMaterial, lightMaterial ]; 
+Robot.lightMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, specular: 0xffffff, ambient: 0xffffff } );
 
-var flareMaterial = new THREE.MeshBasicMaterial( { color: 0xff9999, specular: 0xffffff, ambient: 0xffffff } );
-Robot.flareFrame = [ flareMaterial, flareMaterial ]; 
+Robot.flareMaterial = new THREE.MeshBasicMaterial( { color: 0xff9999, specular: 0xffffff, ambient: 0xffffff } );
 
 // INSTANCE METHODS
 
@@ -93,18 +87,18 @@ Robot.prototype.createLimbJoint = function(inName, diameter, thickness) {
 	var joint = new THREE.Object3D();
 
 	var outerGeometry = new THREE.CylinderGeometry( diameter, diameter, thickness, 30, 4 );
-	var outer = THREE.SceneUtils.createMultiMaterialObject( 
+	var outer = new THREE.Mesh( 
 		outerGeometry, 
-		Robot.goldFrame );
+		Robot.goldMaterial );
 	outer.position.set(0, 0, 0);
 	outer.rotation.z = Math.PI / 2;
 
 	joint.add(outer);
 
 	var innerGeometry = new THREE.CylinderGeometry( diameter/2, diameter/2, thickness+.5, 30, 4 );
-	var inner = THREE.SceneUtils.createMultiMaterialObject( 
+	var inner = new THREE.Mesh( 
 		innerGeometry, 
-		Robot.redFrame );
+		Robot.redMaterial );
 	inner.position.set(0, 0, 0);
 	inner.rotation.z = Math.PI / 2;
 
@@ -118,15 +112,15 @@ Robot.prototype.createLimbJoint = function(inName, diameter, thickness) {
 Robot.prototype.createLimbSegment = function(inName, length, thickness) {
 	var segment = new THREE.Object3D();
 
-	var bone1 = THREE.SceneUtils.createMultiMaterialObject( 
+	var bone1 = new THREE.Mesh( 
 		new THREE.CylinderGeometry(0.6 * thickness, 0.7 * thickness, length, 20, 4 ), 
-		Robot.redFrame );
+		Robot.redMaterial );
 	bone1.position.set(0, -length, 0 + 0.75 * thickness);
 	segment.add(bone1);
 
-	var bone2 = THREE.SceneUtils.createMultiMaterialObject( 
+	var bone2 = new THREE.Mesh( 
 		new THREE.CylinderGeometry(0.6 * thickness, 0.7 * thickness, length, 20, 4 ), 
-		Robot.redFrame );
+		Robot.redMaterial );
 	bone2.position.set(0, -length, 0 - 0.75 * thickness);
 	segment.add(bone2);
 
@@ -138,35 +132,35 @@ Robot.prototype.createLimbSegment = function(inName, length, thickness) {
 Robot.prototype.createTank = function(inName) {
 	var tank = new THREE.Object3D();
 
-	var cylinder = THREE.SceneUtils.createMultiMaterialObject( 
+	var cylinder = new THREE.Mesh( 
 		new THREE.CylinderGeometry( 10, 10, 60, 20, 4 ), 
-		Robot.goldFrame );
+		Robot.goldMaterial );
 	cylinder.position.set(0, 0, 0);
 	tank.add(cylinder);
 
-	var topSphere = THREE.SceneUtils.createMultiMaterialObject( 
+	var topSphere = new THREE.Mesh( 
 		new THREE.SphereGeometry( 10, 32, 16 ), 
-		Robot.goldFrame );
+		Robot.goldMaterial );
 	topSphere.position.set(0, 30, 0);
 	tank.add(topSphere);
 
-	var topTorus = THREE.SceneUtils.createMultiMaterialObject( 
+	var topTorus = new THREE.Mesh( 
 		new THREE.TorusGeometry( 10.5, 1, 32, 16 ), 
-		Robot.redFrame );
+		Robot.redMaterial );
 	topTorus.position.set(0, 30, 0);
 	topTorus.rotation.x = Math.PI / 2;
 
 	tank.add(topTorus);
 
-	var bottomSphere = THREE.SceneUtils.createMultiMaterialObject( 
+	var bottomSphere = new THREE.Mesh( 
 		new THREE.SphereGeometry( 10, 32, 16 ), 
-		Robot.goldFrame );
+		Robot.goldMaterial );
 	bottomSphere.position.set(0, -30, 0);
 	tank.add(bottomSphere);
 
-	var bottomTorus = THREE.SceneUtils.createMultiMaterialObject( 
+	var bottomTorus = new THREE.Mesh( 
 		new THREE.TorusGeometry( 10.5, 1, 32, 16 ), 
-		Robot.redFrame );
+		Robot.redMaterial );
 	bottomTorus.position.set(0, -30, 0);
 	bottomTorus.rotation.x = Math.PI / 2;
 
@@ -178,8 +172,9 @@ Robot.prototype.createTank = function(inName) {
 Robot.prototype.createLight = function(inName) {
 	var light = new THREE.Object3D();
 
-	var lightSphere = THREE.SceneUtils.createMultiMaterialObject( 
-	new THREE.SphereGeometry( 3, 32, 16 ), Robot.lightFrame );
+	var lightSphere = new THREE.Mesh( 
+		new THREE.SphereGeometry( 3, 32, 16 ),
+		Robot.lightMaterial );
 	lightSphere.position.set(0, 0, 0);
 	light.add(lightSphere);
 
@@ -210,9 +205,9 @@ Robot.prototype.createEye = function() {
 
 	var socketGeometry = new THREE.CylinderGeometry( 5, 5, 20, 20, 8 );
 
-	var socket = THREE.SceneUtils.createMultiMaterialObject( 
+	var socket = new THREE.Mesh( 
 		socketGeometry, 
-		Robot.goldFrame );
+		Robot.goldMaterial);
 	socket.rotation.x = Math.PI / 2;
 
 	eye.add(socket);
@@ -229,15 +224,15 @@ Robot.prototype.createHead = function() {
 
 	var skullGeometry = new THREE.CylinderGeometry( 18, 18, 30, 40, 6 );
 
-	var skull = THREE.SceneUtils.createMultiMaterialObject( 
+	var skull = new THREE.Mesh( 
 		skullGeometry, 
-		Robot.redFrame );
+		Robot.redMaterial );
 	skull.position.set(0, 20, 0);
 	head.add(skull);
 
-	var neck = THREE.SceneUtils.createMultiMaterialObject( 
+	var neck = new THREE.Mesh( 
 		new THREE.CylinderGeometry( 10, 10, 10, 20, 4 ), 
-		Robot.goldFrame );
+		Robot.goldMaterial );
 	neck.position.set(0, 0, 0);
 	head.add(neck);
 
@@ -257,9 +252,9 @@ Robot.prototype.createHead = function() {
 Robot.prototype.createBody = function() {
 	var body = new THREE.Object3D();
 
-	var tube = THREE.SceneUtils.createMultiMaterialObject( 
+	var tube = new THREE.Mesh( 
 		new THREE.CylinderGeometry( 3, 3, 100, 20, 4 ), 
-		Robot.steelFrame );
+		Robot.steelMaterial );
 	tube.rotation.z = Math.PI / 2;
 	tube.position.y = 110;
 	body.add(tube);	
@@ -274,24 +269,24 @@ Robot.prototype.createBody = function() {
 
 	var bodyGeometry = new THREE.BoxGeometry( 70, 80, 30, 4, 4, 4 );
 
-	var bodyBox = THREE.SceneUtils.createMultiMaterialObject( 
+	var bodyBox = new THREE.Mesh( 
 		bodyGeometry, 
-		Robot.steelFrame );
+		Robot.steelMaterial );
 	bodyBox.position.y = 80;
 	body.add(bodyBox);
 
 	var hipsGeometry = new THREE.BoxGeometry( 50, 30, 30, 4, 4, 4 );
-	var hips = THREE.SceneUtils.createMultiMaterialObject( 
+	var hips = new THREE.Mesh( 
 		hipsGeometry, 
-		Robot.steelFrame );
+		Robot.steelMaterial );
 	hips.position.y = 20;
 	body.add(hips);
 
 	var beltGeometry = new THREE.BoxGeometry( 43, 30, 23, 4, 4, 4 );
 
-	var belt = THREE.SceneUtils.createMultiMaterialObject( 
+	var belt = new THREE.Mesh( 
 		beltGeometry, 
-		Robot.goldFrame );
+		Robot.goldMaterial );
 	belt.position.y = 40;
 	body.add(belt);
 
@@ -300,47 +295,12 @@ Robot.prototype.createBody = function() {
 	return body;
 }
 
-Robot.prototype.createFoot = function(inName) {
-	var foot = new THREE.Object3D();
-
-	var heel = THREE.SceneUtils.createMultiMaterialObject( 
-		new THREE.BoxGeometry( 16, 10, 16, 1, 1, 1 ), 
-		Robot.steelFrame );
-	heel.position.set(0, 5, 0);
-	heel.name = "heel";
-
-	foot.add(heel);
-
-	for (var toeIndex = -1; toeIndex <= 1; toeIndex++) {
-		var toe = THREE.SceneUtils.createMultiMaterialObject( 
-			new THREE.CylinderGeometry( 2, 2, 20, 20, 4 ), 
-			Robot.redFrame );
-		toe.position.set(5 * toeIndex, 5, -16);
-		toe.rotation.x = Math.PI / 2;
-
-		toe.name = "toe" + toeIndex;
-
-		foot.add(toe);
-	}
-
-	var toebox = THREE.SceneUtils.createMultiMaterialObject( 
-		new THREE.BoxGeometry( 16, 10, 10, 1, 1, 1 ), 
-		Robot.steelFrame );
-	toebox.position.set(0, 5, -22);
-	toebox.name = "toebox";
-
-	foot.add(toebox);
-
-	foot.name = inName;
-
-	return foot;
-}
-
 Robot.prototype.createFlare = function(inName) {
 	var light = new THREE.Object3D();
 
-	var lightCylinder = THREE.SceneUtils.createMultiMaterialObject( 
-	new THREE.CylinderGeometry( 10, 10, 3, 30, 4 ), Robot.flareFrame );
+	var lightCylinder = new THREE.Mesh( 
+		new THREE.CylinderGeometry( 10, 10, 3, 30, 4 ),
+		Robot.flareMaterial );
 	lightCylinder.position.set(0, 6, 0);
 	light.add(lightCylinder);
 
@@ -359,9 +319,9 @@ Robot.prototype.createShinJet = function(inName) {
 
 	var tubeGeometry = new THREE.CylinderGeometry( 15, 15, 60, 30, 10 );
 
-	var tube = THREE.SceneUtils.createMultiMaterialObject( 
+	var tube = new THREE.Mesh( 
 		tubeGeometry, 
-		Robot.redFrame );
+		Robot.redMaterial );
 	tube.position.set(0, 50, 0);
 	tube.name = 'tube';
 	shinjet.add(tube);
@@ -427,9 +387,9 @@ Robot.prototype.createArm = function(inName) {
 	bone.position.y = 25;
 	forearm.add(bone);
 
-	var hand = THREE.SceneUtils.createMultiMaterialObject( 
+	var hand = new THREE.Mesh( 
 		new THREE.SphereGeometry( 10, 32, 16 ), 
-		Robot.goldFrame );
+		Robot.goldMaterial );
 	hand.position.y = -57;
 	forearm.add(hand);
 	forearm.name = "forearm"
