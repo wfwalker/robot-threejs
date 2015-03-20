@@ -25,6 +25,23 @@ animate();
 
 // consider using http://evanw.github.com/csg.js/docs/
 
+function createBeacon(inName) {
+	var platform = new THREE.Object3D();
+
+	var floor = THREE.SceneUtils.createMultiMaterialObject( 
+		new THREE.BoxGeometry( 400, 400, 400, 1, 1, 1 ), 
+		Robot.goldFrame );
+	floor.name = "beacon";
+	floor.position.y = 100;
+	floor.rotation.x = Math.PI / 2;
+
+	platform.add(floor);
+
+	platform.name = inName;
+
+	return platform;
+}
+
 function createPlatform(inName) {
 	var platform = new THREE.Object3D();
 
@@ -66,6 +83,14 @@ function createGloomyWorld(inScene) {
 		randomPlat.position.set(-5000 + Math.random() * 10000, -550 + Math.random() * 500, -5000 + Math.random() * 10000);
 		inScene.add(randomPlat);
 	}	
+
+	// beacon
+
+	var beacon = createBeacon('beacon1');
+	beacon.position.set(2000, 0, 0);
+	console.log(beacon);
+	inScene.add(beacon);
+
 }
 
 function createSunlitWorld(inScene) {
@@ -245,7 +270,7 @@ function initAudio() {
 	panner.coneOuterAngle = 0;
 	panner.coneOuterGain = 0;
 	panner.setOrientation(1,0,0);
-	panner.setPosition(300,0,0);
+	panner.setPosition(2000,0,0);
 	beaconSource.connect(panner);
 
 	// create gain, wire up to noise
