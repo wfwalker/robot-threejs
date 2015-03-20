@@ -725,21 +725,21 @@ Robot.prototype.updateVelocity = function()
 	if (this.currentPose & Robot.PUSH_FORWARDS) {
 		this.velocity = Math.max(-this.maxVelocity, this.velocity - this.acceleration);
 		this.radialVelocity = 0.9 * this.radialVelocity;
-		Robot.pushGain.gain.value = 1;
+		Robot.pushGain.gain.value = 0.5;
 	} 
 	if (this.currentPose & Robot.PUSH_BACKWARDS) {
 		this.radialVelocity = 0.9 * this.radialVelocity;
 		this.velocity = Math.min(this.maxVelocity, this.velocity + this.acceleration);
-		Robot.pushGain.gain.value = 1;
+		Robot.pushGain.gain.value = 0.5;
 	} 
 	
 	if (this.currentPose & Robot.TURN_CLOCKWISE) {
 		this.radialVelocity = Math.min(this.maxRadialVelocity, this.radialVelocity + this.radialAcceleration);
-		Robot.turnGain.gain.value = 1;
+		Robot.turnGain.gain.value = 0.5;
 	} 
 	if (this.currentPose & Robot.TURN_COUNTERCLOCKWISE) {
 		this.radialVelocity = Math.max(-this.maxRadialVelocity, this.radialVelocity - this.radialAcceleration);
-		Robot.turnGain.gain.value = 1;
+		Robot.turnGain.gain.value = 0.5;
 	} 
 
 	if (!(this.currentPose & Robot.TURN_CLOCKWISE || this.currentPose & Robot.TURN_COUNTERCLOCKWISE)) {
@@ -755,7 +755,7 @@ Robot.prototype.updateVelocity = function()
 	}
 
 	// set the engine sound based on both radial and forward velocity
-	Robot.speedGain.gain.value = Math.abs(this.velocity / 1200) + Math.abs(this.radialVelocity / 0.05);
+	Robot.speedGain.gain.value = Math.abs(this.velocity / 2400) + Math.abs(this.radialVelocity / 0.1);
 
 	if (document.getElementById('speedometer')) {
 		document.getElementById('speedometer').innerHTML = Math.round(this.velocity);
