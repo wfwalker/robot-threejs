@@ -66,7 +66,7 @@ Robot.robots = [];
 Robot.floorTexture = new THREE.ImageUtils.loadTexture( 'images/metal1.jpg' );
 Robot.floorTexture.wrapS = Robot.floorTexture.wrapT = THREE.RepeatWrapping; 
 
-Robot.floorMaterial = new THREE.MeshPhongMaterial( { map: Robot.floorTexture, bumpMap: Robot.floorTexture, bumpScale: 0.5, color: 0x222222, specular: 0x444444 } );
+Robot.floorMaterial = new THREE.MeshPhongMaterial( { map: Robot.floorTexture, bumpMap: Robot.floorTexture, bumpScale: 0.5, color: 0x222222, specular: 0x111111 } );
 
 Robot.steelTexture = new THREE.ImageUtils.loadTexture( 'images/moon.jpg' );
 Robot.steelTexture.wrapS = Robot.steelTexture.wrapT = THREE.RepeatWrapping; 
@@ -79,7 +79,7 @@ Robot.goldMaterial = new THREE.MeshPhongMaterial( { map: Robot.steelTexture, bum
 
 Robot.lightMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, specular: 0xffffff, ambient: 0xffffff } );
 
-Robot.flareMaterial = new THREE.MeshBasicMaterial( { color: 0xff9999, specular: 0xffffff, ambient: 0xffffff } );
+Robot.flareMaterial = new THREE.MeshBasicMaterial( { color: 0xff2222, specular: 0xffffff, ambient: 0xffffff } );
 
 // INSTANCE METHODS
 
@@ -304,7 +304,7 @@ Robot.prototype.createFlare = function(inName) {
 	lightCylinder.position.set(0, 6, 0);
 	light.add(lightCylinder);
 
-	var lightSource = new THREE.PointLight(0xff9999, 5, 10);
+	var lightSource = new THREE.PointLight(0xff2222, 5, 100);
 	lightSource.position.set(0, 0, 0);
 	lightSource.name = 'source';
 	light.add(lightSource);
