@@ -157,6 +157,9 @@ function init()
 		bob.parseKeyboardCommands(e);
 	});
 
+	// Web VR polyfill
+	var effect = new THREE.VREffect(renderer);
+	var mgr = new WebVRManager(effect);
 }
 
 function initAudio() {
