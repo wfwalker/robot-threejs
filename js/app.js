@@ -33,16 +33,6 @@ function createBeacon(inName) {
 	return cube;
 }
 
-function createPlatform(inName) {
-	var platformGeometry = new THREE.BoxGeometry( 800, 800, 100, 1, 1, 1 );
-	var platform = new THREE.Mesh( platformGeometry, Robot.floorMaterial );
-
-	platform.name = inName;
-	platform.rotation.x = Math.PI / 2;
-
-	return platform;
-}
-
 function createGloomyWorld(inScene) {
 	var ambientLight = new THREE.AmbientLight(0x222222);
 	inScene.add(ambientLight);	
@@ -52,22 +42,25 @@ function createGloomyWorld(inScene) {
 	inScene.add( directionalLight );
 
 	// SKYBOX/FOG
+	
 	var skyBoxGeometry = new THREE.BoxGeometry( 10000, 10000, 10000 );
 	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x555555, side: THREE.BackSide } );
 	Robot.skybox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
 	inScene.add(Robot.skybox);
 	inScene.fog = new THREE.FogExp2( 0x555555, 0.0003 );
 
-	// floating platforms	
-	var start = createPlatform('start');
-	start.position.y = -50;
-	inScene.add(start);
+	// FLOATING PLATFORMS
+
+	var platformGeometries = new THREE.Geometry();
 
 	for (var index = 0; index < 50; index++) {
-		var randomPlat = createPlatform('platform' + index);
-		randomPlat.position.set(-5000 + Math.random() * 10000, -550 + Math.random() * 500, -5000 + Math.random() * 10000);
-		inScene.add(randomPlat);
+		var platformGeometry = new THREE.BoxGeometry( 800, 100, 800, 1, 1, 1 );
+    	platformGeometry.applyMatrix(new THREE.Matrix4().makeTranslation(-5000 + Math.random() * 10000, -550 + Math.random() * 500, -5000 + Math.random() * 10000));
+		THREE.GeometryUtils.merge(platformGeometries, platformGeometry);
 	}	
+
+	var platforms = new THREE.Mesh( platformGeometries, Robot.floorMaterial );
+	inScene.add(platforms);
 
 	// beacon
 
@@ -75,7 +68,6 @@ function createGloomyWorld(inScene) {
 	beacon.position.set(2000, 100, 0);
 	console.log(beacon);
 	inScene.add(beacon);
-
 }
 
 function createSunlitWorld(inScene) {
