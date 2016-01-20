@@ -95,7 +95,7 @@ Robot.prototype.createLimbJoint = function(inName, diameter, thickness) {
 
 	joint.add(outer);
 
-	var innerGeometry = new THREE.CylinderGeometry( diameter/2, diameter/2, thickness+.5, 30, 4 );
+	var innerGeometry = new THREE.CylinderGeometry( diameter/2, diameter/2, thickness + 2, 30, 4 );
 	var inner = new THREE.Mesh( 
 		innerGeometry, 
 		Robot.redMaterial );
